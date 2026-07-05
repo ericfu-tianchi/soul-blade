@@ -7,13 +7,28 @@ const UI = {
   ua: {}, // processed 和风 UI assets; any key may be null → programmatic fallback
 
   // ---- primitives ---------------------------------------------------------
+  _font(size) { return `${size}px PressStart, FusionPixelJA, FusionPixel, monospace`; },
+
+  textW(ctx, str, size, spacing = 0) {
+    ctx.font = this._font(size);
+    return ctx.measureText(str).width + spacing * Math.max(0, str.length - 1);
+  },
+
   pixText(ctx, str, x, y, opts = {}) {
     const {
-      size = 16, color = '#f4f1e8', align = 'left', baseline = 'alphabetic',
+      color = '#f4f1e8', align = 'left', baseline = 'alphabetic',
       outline = false, outlineColor = '#0d0f16', shadow = 0,
-      shadowColor = 'rgba(0,0,0,0.65)', spacing = 0,
+      shadowColor = 'rgba(0,0,0,0.65)', spacing = 0, maxW = 0,
     } = opts;
-    ctx.font = `${size}px PressStart, FusionPixelJA, FusionPixel, monospace`;
+    let size = opts.size || 16;
+    ctx.font = this._font(size);
+    // shrink-to-fit: copy must never overflow its slot (pixel fonts run wide)
+    if (maxW > 0) {
+      while (size > 9 && ctx.measureText(str).width + spacing * Math.max(0, str.length - 1) > maxW) {
+        size--;
+        ctx.font = this._font(size);
+      }
+    }
     ctx.textBaseline = baseline;
 
     const drawOne = (s, dx, dy, fill) => {
@@ -251,26 +266,25 @@ const UI = {
     this.comboCounter(ctx, G, f1, 150, false);
     this.comboCounter(ctx, G, f2, 874, true);
 
-    // training info bar / key hint bar
-    const strip = (x, y, w, h) => {
+    // training info bar / key hint bar — auto-sized strips stacked ABOVE the
+    // meter labels (y<510) so the bottom rows can never collide or clip
+    const strip = (cy, text, color) => {
+      const tw = Math.min(this.textW(ctx, text, 12), 940);
+      const w = tw + 36, bx = 512 - w / 2;
       ctx.fillStyle = 'rgba(10,8,6,0.8)';
-      ctx.fillRect(x, y, w, h);
+      ctx.fillRect(bx, cy, w, 24);
       ctx.fillStyle = 'rgba(217,164,65,0.5)';
-      ctx.fillRect(x, y, w, 1);
-      ctx.fillRect(x, y + h - 1, w, 1);
+      ctx.fillRect(bx, cy, w, 1);
+      ctx.fillRect(bx, cy + 23, w, 1);
+      this.pixText(ctx, text, 512, cy + 17, { size: 12, align: 'center', color, maxW: tw });
     };
     if (G.mode === 'training') {
       const names = { stand: 'STAND', guard: 'AUTO-GUARD', cpu: 'CPU' };
-      strip(182, 470, 660, 24);
-      this.pixText(ctx, `TRAINING · DUMMY: ${names[G.training.dummy]} (T) · R RESET · ∞ METER · AUTO HEAL · ESC EXIT`, 512, 487, {
-        size: 12, align: 'center', color: '#ffe27a',
-      });
+      strip(G.showHint ? 442 : 468,
+        `TRAINING · T DUMMY: ${names[G.training.dummy]} · R RESET · ∞ 気 · AUTO HEAL · ESC EXIT`, '#ffe27a');
     }
     if (G.showHint) {
-      strip(172, 496, 680, 24);
-      this.pixText(ctx, 'J LIGHT · K HEAVY · S CROUCH · AIR-K DIVE · U SPECIAL · I SUPER · HOLD BACK=GUARD · H HIDE', 512, 513, {
-        size: 12, align: 'center', color: '#c9bfa8',
-      });
+      strip(468, 'J LIGHT · K HEAVY · S CROUCH · U SPECIAL · I SUPER · BACK = GUARD · H HIDE', '#c9bfa8');
     }
   },
 
@@ -423,9 +437,9 @@ const UI = {
     ctx.restore();
   },
 
-  // silk banner ribbon behind announcement text (no-op without the asset)
-  ribbon(ctx, cx, cy, w) {
-    const R = this.ua.ribbon;
+  // sumi ink brush-stroke swash behind announcement text (no-op without the asset)
+  inkStroke(ctx, cx, cy, w) {
+    const R = this.ua.announce;
     if (!R) return;
     const h = w * R.h / R.w;
     ctx.drawImage(R.cv, cx - w / 2, cy - h / 2, w, h);
@@ -454,11 +468,11 @@ const UI = {
       ctx.restore();
     } else if (a.style === 'round') {
       const slide = Math.max(0, 10 - a.t) * 16;
-      this.ribbon(ctx, cx, cy - 14, 560);
+      this.inkStroke(ctx, cx, cy - 14, 560);
       this.pixText(ctx, a.text, cx - slide, cy, { size: 40, align: 'center', color: '#f4f1e8', outline: true, shadow: 5 });
       if (a.sub) this.pixText(ctx, a.sub, cx + slide, cy + 36, { size: 18, align: 'center', color: '#ffc531', outline: true });
     } else { // banner
-      this.ribbon(ctx, cx, cy - 4, 640);
+      this.inkStroke(ctx, cx, cy - 4, 640);
       this.pixText(ctx, a.text, cx, cy, { size: 34, align: 'center', color: '#f4f1e8', outline: true, shadow: 5 });
       if (a.sub) this.pixText(ctx, a.sub, cx, cy + 42, { size: 20, align: 'center', color: '#ffc531', outline: true });
     }
@@ -580,50 +594,53 @@ const UI = {
     else this.panel(ctx, 62, 40, 900, 496, { accent: '#ffc531' });
     this.pixText(ctx, 'HOW TO PLAY · 操作', 512, 84, { size: 24, align: 'center', color: '#ffe27a', outline: true });
 
+    // two columns with hard width budgets: col1 desc 252..516, col2 desc 700..934;
+    // every line carries maxW so nothing can collide with keycaps or the panel edge
     const rows = [
-      ['A D', 'MOVE / HOLD BACK = GUARD', 'W', 'JUMP (works in dash)'],
-      ['J', 'LIGHT (alternating slashes)', 'K', 'HEAVY / IN AIR = DIVE SLAM'],
-      ['S', 'CROUCH: J LOW STAB / K LAUNCHER', 'U I', 'SPECIAL (cooldown) / SUPER (MAX 気)'],
-      ['A A / D D', 'DASH / BACKDASH (i-frames)', '', ''],
+      ['A D', 'MOVE · BACK = GUARD', 'W', 'JUMP (OK MID-DASH)'],
+      ['J', 'LIGHT · ALT SLASHES', 'K', 'HEAVY · AIR = DIVE'],
+      ['S', 'CROUCH · J LOW / K UP', 'U I', 'SPECIAL / SUPER'],
+      ['A A / D D', 'DASH / BACKDASH', 'ESC', 'PAUSE'],
     ];
-    let y = 118;
+    let y = 116;
     for (const [k1, d1, k2, d2] of rows) {
       this.keycap(ctx, 100, y, Math.max(44, k1.length * 13 + 18), k1);
-      this.pixText(ctx, d1, 240, y + 24, { size: 15, color: '#efe6d5' });
-      if (k2) {
-        this.keycap(ctx, 540, y, Math.max(44, k2.length * 13 + 18), k2);
-        this.pixText(ctx, d2, 690, y + 24, { size: 15, color: '#efe6d5' });
-      }
-      y += 52;
+      this.pixText(ctx, d1, 252, y + 26, { size: 12, color: '#efe6d5', maxW: 264 });
+      this.keycap(ctx, 548, y, Math.max(44, k2.length * 13 + 18), k2);
+      this.pixText(ctx, d2, 700, y + 26, { size: 12, color: '#efe6d5', maxW: 234 });
+      y += 46;
     }
 
-    // combo branch callout
-    ctx.fillStyle = 'rgba(217,164,65,0.1)';
-    ctx.fillRect(100, y, 824, 40);
-    this.pixText(ctx, 'COMBO ENDERS: J-J-K then K (knockdown) / U (HAYATO) / I (SUPER, MAX 気)', 112, y + 26, { size: 15, color: '#d9a441' });
-    y += 56;
-
     // combo route
-    this.pixText(ctx, 'COMBO · 連携', 100, y + 16, { size: 15, color: '#ffc531' });
+    y = 312;
+    this.pixText(ctx, 'COMBO · 連携', 100, y + 20, { size: 15, color: '#ffc531' });
     const route = ['J', 'J', 'K', 'K', 'U', 'I'];
     let rx = 300;
     route.forEach((k, i) => {
-      this.keycap(ctx, rx, y - 6, 44, k);
-      if (i < route.length - 1) this.pixText(ctx, '→', rx + 52, y + 18, { size: 16, color: '#8892ad' });
+      this.keycap(ctx, rx, y - 4, 44, k);
+      if (i < route.length - 1) this.pixText(ctx, '→', rx + 52, y + 22, { size: 16, color: '#8892ad' });
       rx += 74;
     });
-    this.pixText(ctx, 'Chained hits 3+ get BONUS x1.3 · KENJI\'s U is a zoning shuriken, not a combo piece', 300, y + 52, { size: 12, color: '#9a8f78' });
-    y += 74;
 
-    this.pixText(ctx, 'GUARD = hold AWAY at the moment of impact · not while attacking/jumping/dashing · full gauge = GUARD CRUSH', 512, y + 8, {
-      size: 12, align: 'center', color: '#ff9c3d',
+    // combo branch callout
+    ctx.fillStyle = 'rgba(217,164,65,0.1)';
+    ctx.fillRect(100, 356, 824, 30);
+    this.pixText(ctx, 'ENDERS AFTER J-J-K → K KNOCKDOWN · U HAYATO ONLY · I SUPER (MAX 気)', 512, 376, {
+      size: 13, align: 'center', color: '#d9a441', maxW: 800,
     });
-    this.pixText(ctx, 'Hits & guards build 気 · chip never kills · ESC PAUSE · M MUTE · H HIDE HINTS', 512, y + 28, {
-      size: 12, align: 'center', color: '#8892ad',
+    this.pixText(ctx, 'CHAIN 3+ HITS = BONUS x1.3 · KENJI\'S U IS A ZONING SHURIKEN, NOT A COMBO PIECE', 512, 408, {
+      size: 11, align: 'center', color: '#9a8f78', maxW: 800,
     });
 
-    this.pixText(ctx, asOverlay ? 'J / K  BACK' : 'J  BACK TO TITLE', 512, 522, {
-      size: 14, align: 'center', color: G.tick % 40 < 25 ? '#ffe27a' : '#8892ad',
+    this.pixText(ctx, 'GUARD = HOLD AWAY AT IMPACT · NOT WHILE ATTACKING / JUMPING / DASHING', 512, 442, {
+      size: 11, align: 'center', color: '#ff9c3d', maxW: 820,
+    });
+    this.pixText(ctx, 'FULL GAUGE = GUARD CRUSH · HITS & GUARDS BUILD 気 · CHIP NEVER KILLS', 512, 464, {
+      size: 11, align: 'center', color: '#8892ad', maxW: 820,
+    });
+
+    this.pixText(ctx, asOverlay ? 'J / K  BACK' : 'J  BACK TO TITLE · M MUTE · H HIDE HINTS', 512, 522, {
+      size: 14, align: 'center', color: G.tick % 40 < 25 ? '#ffe27a' : '#8892ad', maxW: 820,
     });
   },
 
@@ -750,9 +767,9 @@ const UI = {
 
     this.drawCharPreview(ctx, winner.c.id, 512, 400, 2.6, G.tick, 'idle', true);
 
-    const RB = this.ua.ribbon;
+    const RB = this.ua.announce;
     if (RB) {
-      const RW = 560, RH = RW * RB.h / RB.w;
+      const RW = 680, RH = RW * RB.h / RB.w;
       ctx.drawImage(RB.cv, 512 - RW / 2, 116 - RH / 2, RW, RH);
     }
     this.pixText(ctx, playerWon ? 'VICTORY' : 'DEFEAT', 512, 130, {
@@ -762,11 +779,11 @@ const UI = {
 
     if (this.ua.panel) this.nine(ctx, this.ua.panel, 312, 428, 400, 62, 0.14);
     else this.panel(ctx, 312, 428, 400, 62, { accent: winner.c.theme });
-    this.pixText(ctx, `${winner.c.cn}:「${playerWon ? winner.c.quoteWin : winner.c.quoteWin}」`, 512, 466, {
+    this.pixText(ctx, `${winner.c.cn}:「${winner.c.quoteWin}」`, 512, 466, {
       size: 14, align: 'center', color: '#dfe4f2',
     });
 
-    this.pixText(ctx, `MAX COMBO: ${G.stats.maxCombo} HITS`, 512, this.ua.ribbon ? 240 : 218, { size: 13, align: 'center', color: '#9aa3bd' });
+    this.pixText(ctx, `MAX COMBO: ${G.stats.maxCombo} HITS`, 512, RB ? 240 : 218, { size: 13, align: 'center', color: '#9aa3bd' });
 
     this.pixText(ctx, 'J REMATCH · K CHARACTER · ESC TITLE', 512, 530, {
       size: 14, align: 'center', color: G.tick % 40 < 25 ? '#ffe27a' : '#8892ad',
@@ -801,9 +818,9 @@ const UI = {
       keycap:   () => this._procKeycap(),
       seal:     () => this._procSeal(),
       title:    () => this._procSimple('title-emblem.png'),
-      vs:       () => this._procSimple('vs-emblem.png'),
+      vs:       () => this._procSimple('vs-emblem-v2.png'),
       stage:    () => this._procStage(),
-      ribbon:   () => this._procSimple('banner-ribbon.png'),
+      announce: () => this._procSimple('announce-brush.png'),
       cursor:   () => this._procSimple('cursor-fan.png'),
     };
     for (const [k, fn] of Object.entries(jobs)) {

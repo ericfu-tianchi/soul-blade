@@ -22,8 +22,8 @@
 </head>
 <body>
 <header>
-  <h1>拳魂 · 和风 UI 资产库</h1>
-  <div class="sub">Gemini 图像模型直连生成(gemini-2.5-flash-image) · 已全部接入游戏(运行时抠底/裁切/内窗检测,见 assets/ui-lab/proc.html 管线自检页) · 想重生成/改风格请指着卡片名字说</div>
+  <h1>拳魂 · 和风 UI 资产库 <span style="color:#9a8f78;font-size:13px">v2 · ui-polish 分支</span></h1>
+  <div class="sub">Gemini 图像模型直连生成(gemini-2.5-flash-image, 文生图 + 图生图编辑 + sprite 参考生成) · 运行时抠底/裁切/内窗检测见 assets/ui-lab/proc.html · 想重生成/改风格请指着卡片名字说 · 标「待接入」的资产等 Eric 过目后才进游戏</div>
 </header>
 <div class="grid" id="grid"></div>
 <footer>
@@ -39,10 +39,15 @@ const ASSETS = [
   ['keycap', '按键帽', '键位教学屏的按键图示', '现为程序化灰蓝键帽(风格最不搭,优先换)'],
   ['timer-seal', '计时印章', '顶部中央回合倒计时的朱印底座', '现为程序化朱红方块'],
   ['title-emblem', '标题徽章', '标题画面「拳魂」字后的旭日/円相底纹', '现为程序化旭日+光芒'],
-  ['vs-emblem', 'VS 徽章', '选人确认后的 VS 过场中心图案', '现为纯文字 VS'],
+  ['vs-emblem-v2', 'VS 徽章 v2 (刀刃修正)', '选人确认后的 VS 过场中心图案 —— 图生图编辑: 保留徽章整体, 柄上刃下, 下端改为出鞘刀尖', '已接入 (v1 弃用: 下半段全是刀柄)'],
   ['stage-alt', '战斗场景(AI生成版)', '对战背景 —— 已设为默认(?stage=proc 可切回程序化版)', '已接入'],
-  ['banner-ribbon', '公告缎带(补生成)', 'ROUND/胜负公告与结算屏标题的丝绸缎带底', '已接入'],
+  ['announce-brush', '公告墨痕 (替换缎带)', 'ROUND/胜负公告与结算屏标题的枯笔墨痕底 —— 纯黑硬边+朱红飞沫+金点', '已接入 (banner-ribbon 缎带退役)'],
   ['cursor-fan', '菜单光标·折扇(补生成)', '标题菜单选中项两侧的折扇指示', '已接入'],
+  ['nameplate', '名牌底 (菱角漆牌)', 'HUD 角色名 / 选人屏名字条的底牌, 左端朱红结饰', '待接入 (P2)'],
+  ['pip-mon', '胜场标记·家纹章', 'HUD 回合胜利 pips, 替换程序化小菱形; 未胜场用暗化版', '待接入 (P2)'],
+  ['combo-splash', '连击计数底饰·泼墨', '连击数字后的朱红泼墨爆点, 强化打击感', '待接入 (P2)'],
+  ['portrait-hayato', '隼人 · 半身立绘', '选人屏 / VS 过场 / 结算屏共用 —— 以 Idle 帧为参考生成', '待接入 (P1 选人屏改造)'],
+  ['portrait-kenji', '剣二 · 半身立绘', '选人屏 / VS 过场 / 结算屏共用 —— 以 Idle 帧为参考生成', '待接入 (P1 选人屏改造)'],
 ];
 const g = document.getElementById('grid');
 for (const [file, name, use, cur] of ASSETS) {
