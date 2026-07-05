@@ -517,33 +517,58 @@ const UI = {
 
   // ---- title ------------------------------------------------------------------
   drawTitle(ctx, G) {
-    ctx.drawImage(this.bgCanvas(G), 0, 0);
-    ctx.fillStyle = 'rgba(7,8,12,0.78)';
+    const V = this.variant || {};
+    const bgCv = (V.tbg && this.ua.tbg) ? this.ua.tbg.cv : this.bgCanvas(G);
+    ctx.drawImage(bgCv, 0, 0);
+    ctx.fillStyle = `rgba(7,8,12,${(V.tbg && this.ua.tbg) ? 0.38 : 0.78})`;
     ctx.fillRect(0, 0, 1024, 576);
 
     this.drawCharPreview(ctx, 'mack', 190, 500, 2.4, G.tick, 'idle', true);
     this.drawCharPreview(ctx, 'kenji', 834, 500, 2.4, G.tick, 'idle', false);
 
-    // logo: enso emblem (asset) or rising sun disc + brush title, 和风
     ctx.save();
     const bob = Math.sin(G.tick * 0.04) * 4;
     ctx.translate(0, bob);
-    const TE = this.ua.title;
-    if (TE) {
-      const TW = 352, TH = TW * TE.h / TE.w;
-      ctx.drawImage(TE.cv, 512 - TW / 2, 185 - TH / 2, TW, TH);
+    if (V.te && this.ua.temblem) {
+      // title-design preview (?te=...): alt emblem + placeholder name 刀魂;
+      // pos = per-kanji [x-frac of W, y-frac of H (char center)]
+      const A = this.ua.temblem;
+      const KANJI = '刀魂';
+      const L = {
+        kanban:   { W: 340, y0: 30, pos: [[0.305, 0.60], [0.715, 0.60]], size: 88, color: '#241610', outline: false },
+        gunsen:   { W: 350, y0: 22, pos: [[0.365, 0.25], [0.635, 0.25]], size: 80, color: '#241610', outline: false },
+        zangetsu: { W: 330, y0: 26, pos: [[0.34, 0.46], [0.66, 0.46]], size: 92, color: '#f4ead6', outline: true },
+        torii:    { W: 350, y0: 24, pos: [[0.365, 0.33], [0.635, 0.33]], size: 84, color: '#f4ead6', outline: true },
+      }[V.te];
+      const W = L.W, H = W * A.h / A.w, x0 = 512 - W / 2;
+      ctx.drawImage(A.cv, x0, L.y0, W, H);
+      L.pos.forEach(([fx, fy], i) => {
+        this.pixText(ctx, KANJI[i], x0 + W * fx, L.y0 + H * fy + L.size * 0.38, {
+          size: L.size, align: 'center', color: L.color, outline: L.outline, shadow: L.outline ? 6 : 0,
+        });
+      });
+      const subY = Math.min(L.y0 + H + 26, 350);
+      this.pixText(ctx, 'SOUL BLADE', 512, subY, { size: 18, align: 'center', color: '#d9a441', outline: true, spacing: 8 });
+      this.pixText(ctx, '- 和風 PIXEL FIGHTING -', 512, subY + 22, { size: 10, align: 'center', color: '#9a8f78', spacing: 4 });
     } else {
-      for (const [r, col] of [[152, '#8a6a2f'], [146, '#b32b20'], [138, '#c93527']]) {
-        ctx.fillStyle = col;
-        for (let yy = -r; yy <= r; yy += 4) {
-          const half = Math.floor(Math.sqrt(r * r - yy * yy) / 4) * 4;
-          ctx.fillRect(512 - half, 185 + yy, half * 2, 4);
+      // logo: enso emblem (asset) or rising sun disc + brush title, 和风
+      const TE = this.ua.title;
+      if (TE) {
+        const TW = 352, TH = TW * TE.h / TE.w;
+        ctx.drawImage(TE.cv, 512 - TW / 2, 185 - TH / 2, TW, TH);
+      } else {
+        for (const [r, col] of [[152, '#8a6a2f'], [146, '#b32b20'], [138, '#c93527']]) {
+          ctx.fillStyle = col;
+          for (let yy = -r; yy <= r; yy += 4) {
+            const half = Math.floor(Math.sqrt(r * r - yy * yy) / 4) * 4;
+            ctx.fillRect(512 - half, 185 + yy, half * 2, 4);
+          }
         }
       }
+      this.pixText(ctx, '拳魂', 512, 226, { size: 108, align: 'center', color: '#f4ead6', outline: true, shadow: 8 });
+      this.pixText(ctx, 'SOUL FIST', 512, 288, { size: 22, align: 'center', color: '#d9a441', outline: true, spacing: 8 });
+      this.pixText(ctx, '- 和風 PIXEL FIGHTING -', 512, 316, { size: 10, align: 'center', color: '#9a8f78', spacing: 4 });
     }
-    this.pixText(ctx, '拳魂', 512, 226, { size: 108, align: 'center', color: '#f4ead6', outline: true, shadow: 8 });
-    this.pixText(ctx, 'SOUL FIST', 512, 288, { size: 22, align: 'center', color: '#d9a441', outline: true, spacing: 8 });
-    this.pixText(ctx, '- 和風 PIXEL FIGHTING -', 512, 316, { size: 10, align: 'center', color: '#9a8f78', spacing: 4 });
     ctx.restore();
 
     // menu: lacquered wood boards with a folding-fan cursor
@@ -824,10 +849,32 @@ const UI = {
       announce: () => this._procSimple('announce-brush.png').then(t => this._inkCentroid(t)),
       cursor:   () => this._procSimple('cursor-fan.png'),
     };
+    // title-design previews (?te=kanban|gunsen|zangetsu|torii & ?tbg=moon|gate):
+    // loaded only when requested; the picked combo will become the default
+    const q = new URLSearchParams(location.search);
+    const TE_FILES = {
+      kanban: ['title-kanban.png', 38], gunsen: ['title-gunsen.png', 38],
+      zangetsu: ['title-zangetsu.png', 38], torii: ['title-torii.png', 24],
+    };
+    const TBG_FILES = { moon: ['titlebg-moon.png', 40], gate: ['titlebg-gate.png', 150] };
+    const te = q.get('te'), tbg = q.get('tbg');
+    this.variant = { te: TE_FILES[te] ? te : '', tbg: TBG_FILES[tbg] ? tbg : '' };
+    if (this.variant.te) jobs.temblem = () => this._procSimple(...TE_FILES[te]);
+    if (this.variant.tbg) jobs.tbg = () => this._procTitleBg(...TBG_FILES[tbg]);
+
     for (const [k, fn] of Object.entries(jobs)) {
       try { this.ua[k] = await fn(); }
       catch (e) { console.warn('UI asset "' + k + '" failed, using fallback:', e); this.ua[k] = null; }
     }
+  },
+
+  // square scene art → 1024x576 band starting at source row `top`
+  async _procTitleBg(file, top) {
+    const img = await this._loadImg(file);
+    const [cv, g] = this._cv(1024, 576);
+    const sw = img.width, sh = Math.round(sw * 576 / 1024);
+    g.drawImage(img, 0, Math.min(top, img.height - sh), sw, sh, 0, 0, 1024, 576);
+    return { cv, w: 1024, h: 576 };
   },
 
   _loadImg(file) {
