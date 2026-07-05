@@ -437,12 +437,26 @@ const UI = {
     ctx.restore();
   },
 
-  // sumi ink brush-stroke swash behind announcement text (no-op without the asset)
+  // alpha-weighted vertical centroid of the ink mass → cyFrac, so text can be
+  // anchored on where the ink actually is (the brush art is bottom-heavy)
+  _inkCentroid(t) {
+    const g = t.cv.getContext('2d');
+    const d = g.getImageData(0, 0, t.w, t.h).data;
+    let sum = 0, n = 0;
+    for (let y = 0; y < t.h; y++) for (let x = 0; x < t.w; x++) {
+      if (d[(y * t.w + x) * 4 + 3] > 60) { sum += y; n++; }
+    }
+    t.cyFrac = n ? sum / n / t.h : 0.5;
+    return t;
+  },
+
+  // sumi ink brush-stroke swash behind announcement text (no-op without the
+  // asset); cy = where the ink centroid lands — pass the text's visual center
   inkStroke(ctx, cx, cy, w) {
     const R = this.ua.announce;
     if (!R) return;
     const h = w * R.h / R.w;
-    ctx.drawImage(R.cv, cx - w / 2, cy - h / 2, w, h);
+    ctx.drawImage(R.cv, cx - w / 2, cy - h * (R.cyFrac || 0.5), w, h);
   },
 
   // ---- announcements --------------------------------------------------------
@@ -468,13 +482,13 @@ const UI = {
       ctx.restore();
     } else if (a.style === 'round') {
       const slide = Math.max(0, 10 - a.t) * 16;
-      this.inkStroke(ctx, cx, cy - 14, 560);
-      this.pixText(ctx, a.text, cx - slide, cy, { size: 40, align: 'center', color: '#f4f1e8', outline: true, shadow: 5 });
-      if (a.sub) this.pixText(ctx, a.sub, cx + slide, cy + 36, { size: 18, align: 'center', color: '#ffc531', outline: true });
+      this.inkStroke(ctx, cx, cy - 12, 560); // ink centroid on the text's visual center
+      this.pixText(ctx, a.text, cx - slide, cy, { size: 34, align: 'center', color: '#f4f1e8', outline: true, shadow: 5 });
+      if (a.sub) this.pixText(ctx, a.sub, cx + slide, cy + 32, { size: 15, align: 'center', color: '#ffc531', outline: true });
     } else { // banner
-      this.inkStroke(ctx, cx, cy - 4, 640);
-      this.pixText(ctx, a.text, cx, cy, { size: 34, align: 'center', color: '#f4f1e8', outline: true, shadow: 5 });
-      if (a.sub) this.pixText(ctx, a.sub, cx, cy + 42, { size: 20, align: 'center', color: '#ffc531', outline: true });
+      this.inkStroke(ctx, cx, cy - 10, 640);
+      this.pixText(ctx, a.text, cx, cy, { size: 30, align: 'center', color: '#f4f1e8', outline: true, shadow: 5 });
+      if (a.sub) this.pixText(ctx, a.sub, cx, cy + 38, { size: 16, align: 'center', color: '#ffc531', outline: true });
     }
     ctx.globalAlpha = 1;
   },
@@ -514,16 +528,6 @@ const UI = {
     ctx.save();
     const bob = Math.sin(G.tick * 0.04) * 4;
     ctx.translate(0, bob);
-    // sun rays
-    ctx.save();
-    ctx.translate(512, 185);
-    ctx.rotate(G.tick * 0.0012);
-    ctx.fillStyle = 'rgba(179,43,32,0.16)';
-    for (let i = 0; i < 12; i++) {
-      ctx.rotate(Math.PI / 6);
-      ctx.fillRect(-13, -235, 26, 235);
-    }
-    ctx.restore();
     const TE = this.ua.title;
     if (TE) {
       const TW = 352, TH = TW * TE.h / TE.w;
@@ -562,7 +566,7 @@ const UI = {
       }
       if (sel && G.tick % 30 < 22) {
         if (FAN) {
-          const fw = 30, fh = fw * FAN.h / FAN.w;
+          const fw = 46, fh = fw * FAN.h / FAN.w;
           ctx.drawImage(FAN.cv, bx - fw - 10, by + bh / 2 - fh / 2, fw, fh);
           ctx.save(); ctx.scale(-1, 1);
           ctx.drawImage(FAN.cv, -(bx + bw + fw + 10), by + bh / 2 - fh / 2, fw, fh);
@@ -768,14 +772,11 @@ const UI = {
     this.drawCharPreview(ctx, winner.c.id, 512, 400, 2.6, G.tick, 'idle', true);
 
     const RB = this.ua.announce;
-    if (RB) {
-      const RW = 680, RH = RW * RB.h / RB.w;
-      ctx.drawImage(RB.cv, 512 - RW / 2, 116 - RH / 2, RW, RH);
-    }
+    if (RB) this.inkStroke(ctx, 512, 114, 640); // ink centroid on VICTORY's visual center
     this.pixText(ctx, playerWon ? 'VICTORY' : 'DEFEAT', 512, 130, {
-      size: 54, align: 'center', color: playerWon ? '#ffc531' : '#f4ead6', outline: true, shadow: 6, spacing: 6,
+      size: 46, align: 'center', color: playerWon ? '#ffc531' : '#f4ead6', outline: true, shadow: 6, spacing: 6,
     });
-    this.pixText(ctx, playerWon ? '勝利' : '敗北', 512, RB ? 208 : 172, { size: 22, align: 'center', color: '#f4f1e8', outline: true });
+    this.pixText(ctx, playerWon ? '勝利' : '敗北', 512, RB ? 205 : 172, { size: 22, align: 'center', color: '#f4f1e8', outline: true });
 
     if (this.ua.panel) this.nine(ctx, this.ua.panel, 312, 428, 400, 62, 0.14);
     else this.panel(ctx, 312, 428, 400, 62, { accent: winner.c.theme });
@@ -783,7 +784,7 @@ const UI = {
       size: 14, align: 'center', color: '#dfe4f2',
     });
 
-    this.pixText(ctx, `MAX COMBO: ${G.stats.maxCombo} HITS`, 512, RB ? 240 : 218, { size: 13, align: 'center', color: '#9aa3bd' });
+    this.pixText(ctx, `MAX COMBO: ${G.stats.maxCombo} HITS`, 512, RB ? 236 : 218, { size: 13, align: 'center', color: '#9aa3bd' });
 
     this.pixText(ctx, 'J REMATCH · K CHARACTER · ESC TITLE', 512, 530, {
       size: 14, align: 'center', color: G.tick % 40 < 25 ? '#ffe27a' : '#8892ad',
@@ -820,7 +821,7 @@ const UI = {
       title:    () => this._procSimple('title-emblem.png'),
       vs:       () => this._procSimple('vs-emblem-v2.png'),
       stage:    () => this._procStage(),
-      announce: () => this._procSimple('announce-brush.png'),
+      announce: () => this._procSimple('announce-brush.png').then(t => this._inkCentroid(t)),
       cursor:   () => this._procSimple('cursor-fan.png'),
     };
     for (const [k, fn] of Object.entries(jobs)) {
