@@ -27,7 +27,7 @@
 </header>
 <header>
   <h1 style="font-size:17px">标题页整装效果图 <span style="color:#9a8f78;font-size:12px">真实运行截图, 非拼贴 —— 点卡片可打开可交互的实况版</span></h1>
-  <div class="sub">字样「刀魂 / SOUL BLADE」为占位, 游戏名与构图相互独立, 拍板后可任意替换; 徽章/背景/文字位置均可再微调</div>
+  <div class="sub">「刀魂」现为衡山毛笔字体渲染(免费商用含 logo, 半分辨率烘焙+2x 最近邻放大保像素感, 渐变金/墨字两套处理) —— AI 生成书法字已试过 3 张, 「魂」字笔画全崩, 弃; 游戏名与构图相互独立, 拍板后可任意替换</div>
 </header>
 <div class="grid" id="mockups" style="grid-template-columns:repeat(auto-fill, minmax(480px, 1fr))"></div>
 <div class="grid" id="grid"></div>
@@ -52,8 +52,8 @@ const ASSETS = [
   ['pip-mon', '胜场标记·家纹章', 'HUD 回合胜利 pips, 替换程序化小菱形; 未胜场用暗化版', '待接入 (P2)'],
   ['combo-splash', '连击计数底饰·泼墨', '连击数字后的朱红泼墨爆点, 强化打击感', '待接入 (P2)'],
   ['portrait-kenji', '剣二 · 半身立绘', '选人屏 / VS 过场 / 结算屏共用 —— 以 Idle 帧为参考生成', '待接入 (P1, Eric 已认可形象)'],
-  ['portrait-hayato-v3', '隼人立绘 v3 · 方向一 (painterly 半身)', '按 sprite 真实细节重做: 惨白面具脸, 深棕漆面盘帽斜扣(非草笠), 绯红头巾披风, 邪气; 以剣二立绘为风格锚点 —— 与现有剣二天然成组; v1/v2 已删', '待选 (与方向二二选一)'],
-  ['portrait-hayato-v3-alt', '隼人立绘 v3 · 方向二 (sprite 放大风)', '同密度像素放大风, 红色独眼邪气拉满 —— 若选此方向, 剣二立绘需重做成同风格才成组', '待选 (与方向一二选一)'],
+  ['portrait-hayato-v4a', '隼人立绘 v4 · 方案A', '在 v3 上图生图定向修正(Eric 三点反馈): 薄宽漆盘帽 / 红巾只系脖间 / 红眼 —— 帽形最锐利', '待选 (与方案B二选一)'],
+  ['portrait-hayato-v4b', '隼人立绘 v4 · 方案B', '同 v4 修正, 椭圆薄盘帽与 sprite 最接近, 高领巾, 独眼红光 —— v3(帽形/披风不对)已退居底稿', '待选 (与方案A二选一)'],
   ['title-torii', '标题概念① 鸟居旭日', '朱鸟居+旭日+金芒+鸦影, 「拳魂」二字压在日轮上', '待选 (标题徽章 4 选 1)'],
   ['title-gunsen', '标题概念② 军扇', '黑漆骨金面军扇+日之丸+朱缨, 字压扇面', '待选 (标题徽章 4 选 1)'],
   ['title-zangetsu', '标题概念③ 斩日', '一笔黑墨斜斩红日, 金沫飞溅, 字骑在斩痕上', '待选 (标题徽章 4 选 1)'],
@@ -62,10 +62,11 @@ const ASSETS = [
   ['titlebg-gate', '标题背景② 血暮城门', '仰视城门+纸灯+战旗+鸦群, 上半天空天然留白放 logo', '待选 (标题背景 2 选 1, 也可都不用)'],
 ];
 const MOCKUPS = [
-  ['m1-kanban-moon', 'A · 双挂牌 × 月夜神社', 'te=kanban&tbg=moon', '暖色纸牌撞冷色月夜, 反差最强'],
+  ['m6-zangetsu-gate', 'F · 斩日 × 血暮城门 (Eric 指定组合)', 'te=zangetsu&tbg=gate', '毛笔「刀魂」+斩痕+血空 —— 本轮主推'],
+  ['m1-kanban-moon', 'A · 双挂牌 × 月夜神社', 'te=kanban&tbg=moon', '墨书牌匾撞冷色月夜, 反差最强'],
   ['m2-kanban-gate', 'B · 双挂牌 × 血暮城门', 'te=kanban&tbg=gate', '战意最浓, 牌匾+战旗+鸦群'],
-  ['m3-gunsen-gate', 'C · 军扇 × 血暮城门', 'te=gunsen&tbg=gate', '扇面题字, 最典雅'],
-  ['m4-zangetsu-stage', 'D · 斩日 × 现役黄昏', 'te=zangetsu', '一笔斩过红日, 最凶最动'],
+  ['m3-gunsen-gate', 'C · 军扇 × 血暮城门', 'te=gunsen&tbg=gate', '扇面墨字, 最典雅'],
+  ['m4-zangetsu-stage', 'D · 斩日 × 现役黄昏', 'te=zangetsu', '同 F 徽章, 背景沿用战斗黄昏'],
   ['m5-torii-moon', 'E · 鸟居旭日 × 月夜神社', 'te=torii&tbg=moon', '神域感, 日月同框(可换背景解)'],
 ];
 const mg = document.getElementById('mockups');

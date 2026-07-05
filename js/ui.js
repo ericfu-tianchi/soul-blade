@@ -516,6 +516,61 @@ const UI = {
   },
 
   // ---- title ------------------------------------------------------------------
+  // brush-font glyph (KouzanBrush) baked to a pixelated sprite: rendered at
+  // half size then 2x nearest-neighbor — brush strokes with pixel grain.
+  // Tinted variants are cached; 'grad' = parchment→gold vertical gradient.
+  _brushGlyph(ch, size, fill) {
+    this._glyphCache = this._glyphCache || {};
+    const key = ch + '|' + size + '|' + fill;
+    if (this._glyphCache[key]) return this._glyphCache[key];
+    const half = Math.ceil(size / 2), pad = Math.ceil(half * 0.35), S = half + pad * 2;
+    const [scv, sg] = this._cv(S, S);
+    sg.imageSmoothingEnabled = true;
+    sg.font = `${half}px KouzanBrush, FusionPixelJA, FusionPixel, monospace`;
+    sg.textAlign = 'center';
+    sg.textBaseline = 'middle';
+    sg.fillStyle = '#ffffff';
+    sg.fillText(ch, S / 2, S / 2);
+    sg.globalCompositeOperation = 'source-in';
+    if (fill === 'grad') {
+      const gr = sg.createLinearGradient(0, S * 0.12, 0, S * 0.88);
+      gr.addColorStop(0, '#f8f0dc');
+      gr.addColorStop(0.5, '#eedfb6');
+      gr.addColorStop(1, '#d9a441');
+      sg.fillStyle = gr;
+    } else {
+      sg.fillStyle = fill;
+    }
+    sg.fillRect(0, 0, S, S);
+    const [cv, g] = this._cv(S * 2, S * 2);
+    g.drawImage(scv, 0, 0, S, S, 0, 0, S * 2, S * 2);
+    return (this._glyphCache[key] = { cv, w: S * 2, h: S * 2 });
+  },
+
+  // logo-grade kanji: brush glyph + slight rotation; gold style adds heavy
+  // lacquer outline + deep-red drop (raw pixel font reads flat at logo size)
+  _logoKanji(ctx, ch, x, cy, size, rot, style) {
+    ctx.save();
+    ctx.translate(x, cy);
+    ctx.rotate(rot);
+    const body = this._brushGlyph(ch, size, style === 'ink' ? '#241610' : 'grad');
+    const ox = -body.w / 2, oy = -body.h / 2;
+    if (style === 'ink') {
+      ctx.globalAlpha = 0.35;
+      ctx.drawImage(this._brushGlyph(ch, size, '#140a06').cv, ox + 3, oy + 3);
+      ctx.globalAlpha = 1;
+    } else {
+      const dark = this._brushGlyph(ch, size, '#150e0b');
+      const red = this._brushGlyph(ch, size, '#5a100c');
+      ctx.globalAlpha = 0.9;
+      ctx.drawImage(red.cv, ox + 6, oy + 7);
+      ctx.globalAlpha = 1;
+      for (const [dx2, dy2] of [[-4, 0], [4, 0], [0, -4], [0, 4], [-3, -3], [3, 3], [-3, 3], [3, -3]]) ctx.drawImage(dark.cv, ox + dx2, oy + dy2);
+    }
+    ctx.drawImage(body.cv, ox, oy);
+    ctx.restore();
+  },
+
   drawTitle(ctx, G) {
     const V = this.variant || {};
     const bgCv = (V.tbg && this.ua.tbg) ? this.ua.tbg.cv : this.bgCanvas(G);
@@ -535,17 +590,19 @@ const UI = {
       const A = this.ua.temblem;
       const KANJI = '刀魂';
       const L = {
-        kanban:   { W: 340, y0: 30, pos: [[0.305, 0.60], [0.715, 0.60]], size: 88, color: '#241610', outline: false },
-        gunsen:   { W: 350, y0: 22, pos: [[0.365, 0.25], [0.635, 0.25]], size: 80, color: '#241610', outline: false },
-        zangetsu: { W: 330, y0: 26, pos: [[0.34, 0.46], [0.66, 0.46]], size: 92, color: '#f4ead6', outline: true },
-        torii:    { W: 350, y0: 24, pos: [[0.365, 0.33], [0.635, 0.33]], size: 84, color: '#f4ead6', outline: true },
+        kanban:   { W: 340, y0: 30, pos: [[0.305, 0.60], [0.715, 0.60]], size: 118, color: '#241610', outline: false },
+        gunsen:   { W: 350, y0: 22, pos: [[0.365, 0.25], [0.635, 0.25]], size: 106, color: '#241610', outline: false },
+        zangetsu: { W: 330, y0: 26, pos: [[0.33, 0.47], [0.67, 0.47]], size: 126, color: '#f4ead6', outline: true },
+        torii:    { W: 350, y0: 24, pos: [[0.36, 0.33], [0.64, 0.33]], size: 112, color: '#f4ead6', outline: true },
       }[V.te];
       const W = L.W, H = W * A.h / A.w, x0 = 512 - W / 2;
       ctx.drawImage(A.cv, x0, L.y0, W, H);
       L.pos.forEach(([fx, fy], i) => {
-        this.pixText(ctx, KANJI[i], x0 + W * fx, L.y0 + H * fy + L.size * 0.38, {
-          size: L.size, align: 'center', color: L.color, outline: L.outline, shadow: L.outline ? 6 : 0,
-        });
+        const sz = i === 0 ? L.size * 1.05 : L.size * 0.95;
+        const dy = i === 0 ? -L.size * 0.05 : L.size * 0.06;
+        const rot = i === 0 ? -0.045 : 0.04;
+        this._logoKanji(ctx, KANJI[i], x0 + W * fx, L.y0 + H * fy + dy, sz, rot,
+          L.outline ? 'gold' : 'ink');
       });
       const subY = Math.min(L.y0 + H + 26, 350);
       this.pixText(ctx, 'SOUL BLADE', 512, subY, { size: 18, align: 'center', color: '#d9a441', outline: true, spacing: 8 });
@@ -859,7 +916,14 @@ const UI = {
     const TBG_FILES = { moon: ['titlebg-moon.png', 40], gate: ['titlebg-gate.png', 150] };
     const te = q.get('te'), tbg = q.get('tbg');
     this.variant = { te: TE_FILES[te] ? te : '', tbg: TBG_FILES[tbg] ? tbg : '' };
-    if (this.variant.te) jobs.temblem = () => this._procSimple(...TE_FILES[te]);
+    if (this.variant.te) {
+      jobs.temblem = () => this._procSimple(...TE_FILES[te]);
+      // logo brush font must be ready before the first frame bakes glyph sprites
+      jobs.brushfont = async () => {
+        await Promise.race([document.fonts.load('90px KouzanBrush'), new Promise(r => setTimeout(r, 2500))]);
+        return true;
+      };
+    }
     if (this.variant.tbg) jobs.tbg = () => this._procTitleBg(...TBG_FILES[tbg]);
 
     for (const [k, fn] of Object.entries(jobs)) {
