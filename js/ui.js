@@ -136,6 +136,19 @@ const UI = {
     ctx.restore();
   },
 
+  // size-matched select/result bust (320x344, faces pre-aligned). Draws head+
+  // shoulders into (rx,ry,rw,rh) clipped; falls back to the sprite preview.
+  drawBust(ctx, cid, rx, ry, rw, rh, dim) {
+    const art = cid === 'kenji' ? this.ua.selkenji : this.ua.selmack;
+    if (!art) { this.drawCharPreview(ctx, cid, rx + rw / 2, ry + rh + 40, 2.25, 0, 'idle', cid === 'mack'); return; }
+    const s = rw / 320;                 // fit width; art is 320 wide
+    ctx.save();
+    ctx.beginPath(); ctx.rect(rx, ry, rw, rh); ctx.clip();
+    if (dim) ctx.filter = 'brightness(0.66) saturate(0.85)';
+    ctx.drawImage(art, rx, ry, 320 * s, 344 * s);
+    ctx.restore();
+  },
+
   makePortraits() {
     for (const cid of Object.keys(DATA)) {
       const c = DATA[cid];
@@ -364,6 +377,15 @@ const UI = {
   },
 
   pip(ctx, x, y, won, theme) {
+    const M = this.ua.pipmon;
+    if (M) {
+      const d = 22, mw = d, mh = d * M.h / M.w;
+      ctx.save();
+      if (!won) ctx.filter = 'brightness(0.34) saturate(0.4)'; // unwon = dimmed crest
+      ctx.drawImage(M.cv, x - mw / 2, y - mh / 2, mw, mh);
+      ctx.restore();
+      return;
+    }
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(Math.PI / 4);
@@ -432,6 +454,11 @@ const UI = {
     ctx.save();
     ctx.translate(x, 150);
     ctx.scale(scale, scale);
+    const SP = this.ua.combofx;
+    if (SP) { // vermillion ink splash behind the count
+      const d = 108, dir = mirror ? -1 : 1;
+      ctx.drawImage(SP.cv, dir * 20 - d / 2, -18 - d / 2, d, d * SP.h / SP.w);
+    }
     this.pixText(ctx, String(f.combo.count), 0, 0, { size: 40, align: mirror ? 'right' : 'left', color: '#ffe27a', outline: true, shadow: 4 });
     this.pixText(ctx, 'HITS!', mirror ? 2 : -2, 22, { size: 13, align: mirror ? 'right' : 'left', color: '#ff9c3d', outline: true });
     ctx.restore();
@@ -780,10 +807,6 @@ const UI = {
         if (!hovered && !chosen) { ctx.save(); ctx.filter = 'brightness(0.72)'; }
         this.nine(ctx, this.ua.panel, x, 116, 320, 330, 0.26);
         if (!hovered && !chosen) ctx.restore();
-        ctx.fillStyle = c.theme; // character-theme band under the top border
-        ctx.globalAlpha = hovered || chosen ? 1 : 0.45;
-        ctx.fillRect(x + 15, 130, 290, 3);
-        ctx.globalAlpha = 1;
       } else {
         this.panel(ctx, x, 116, 320, 330, {
           border: hovered || chosen ? c.theme : '#3a4157',
@@ -791,13 +814,20 @@ const UI = {
           fill: hovered ? 'rgba(22,26,40,0.95)' : 'rgba(16,19,28,0.92)',
         });
       }
-      const animName = hovered || chosen ? 'run' : 'idle';
-      this.drawCharPreview(ctx, cid, x + 160, 296, 2.25, G.tick, animName, i === 0);
-      this.pixText(ctx, c.name, x + 160, 336, { size: 21, align: 'center', color: c.theme, outline: true });
-      this.pixText(ctx, `${c.cn} · ${c.title}`, x + 160, 362, { size: 14, align: 'center', color: '#efe6d5' });
-      this.pixText(ctx, `${c.type} TYPE`, x + 160, 381, { size: 10, align: 'center', color: '#9a8f78', spacing: 2 });
-      this.statBar(ctx, x + 74, 398, '力', c.stats.pow, c.theme);
-      this.statBar(ctx, x + 74, 416, '速', c.stats.spd, c.theme);
+      // matched bust portrait (head+shoulders) in the upper panel
+      this.drawBust(ctx, cid, x + 8, 122, 304, 202, !(hovered || chosen));
+      // theme divider + nameplate under the art
+      ctx.fillStyle = c.theme;
+      ctx.globalAlpha = hovered || chosen ? 1 : 0.5;
+      ctx.fillRect(x + 16, 322, 288, 2);
+      ctx.globalAlpha = 1;
+      const NP = this.ua.nameplate;
+      if (NP) ctx.drawImage(NP.cv, x + 44, 328, 232, 232 * NP.h / NP.w);
+      this.pixText(ctx, c.name, x + 168, 350, { size: 20, align: 'center', color: hovered || chosen ? c.theme : '#c9bfa8', outline: true });
+      this.pixText(ctx, `${c.cn} · ${c.title}`, x + 160, 376, { size: 13, align: 'center', color: '#efe6d5' });
+      this.pixText(ctx, `${c.type} TYPE`, x + 160, 393, { size: 10, align: 'center', color: '#9a8f78', spacing: 2 });
+      this.statBar(ctx, x + 74, 406, '力', c.stats.pow, c.theme);
+      this.statBar(ctx, x + 74, 424, '速', c.stats.spd, c.theme);
       if (hovered && G.tick % 30 < 20) {
         this.pixText(ctx, '▼', x + 160, 112, { size: 16, align: 'center', color: '#ffc531' });
       }
@@ -851,7 +881,7 @@ const UI = {
     const winner = r.winner;
     const playerWon = winner === G.fighters[0];
 
-    this.drawCharPreview(ctx, winner.c.id, 512, 400, 2.6, G.tick, 'idle', true);
+    this.drawBust(ctx, winner.c.id, 384, 246, 256, 190, false);
 
     const RB = this.ua.announce;
     if (RB) this.inkStroke(ctx, 512, 114, 640); // ink centroid on VICTORY's visual center
@@ -905,26 +935,31 @@ const UI = {
       stage:    () => this._procStage(),
       announce: () => this._procSimple('announce-brush.png').then(t => this._inkCentroid(t)),
       cursor:   () => this._procSimple('cursor-fan.png'),
+      // size-matched character-select busts (pre-composed transparent, 320x344)
+      selmack:  () => this._loadImg('portrait-hayato-sel.png'),
+      selkenji: () => this._loadImg('portrait-kenji-sel.png'),
+      pipmon:   () => this._procSimple('pip-mon.png'),           // round-win crest
+      combofx:  () => this._procSimple('combo-splash.png'),      // combo backdrop
+      nameplate:() => this._procSimple('nameplate.png'),         // name bar (knot on left)
     };
-    // title-design previews (?te=kanban|gunsen|zangetsu|torii & ?tbg=moon|gate):
-    // loaded only when requested; the picked combo will become the default
+    // title design: DEFAULT = 斩日 emblem × 血暮城门 bg × brush 刀魂 (Eric's pick).
+    // URL overrides: ?te=kanban|gunsen|zangetsu|torii & ?tbg=moon|gate & ?tk=off
     const q = new URLSearchParams(location.search);
     const TE_FILES = {
       kanban: ['title-kanban.png', 38], gunsen: ['title-gunsen.png', 38],
       zangetsu: ['title-zangetsu.png', 38], torii: ['title-torii.png', 24],
     };
     const TBG_FILES = { moon: ['titlebg-moon.png', 40], gate: ['titlebg-gate.png', 150] };
-    const te = q.get('te'), tbg = q.get('tbg');
-    this.variant = { te: TE_FILES[te] ? te : '', tbg: TBG_FILES[tbg] ? tbg : '' };
-    if (this.variant.te) {
-      jobs.temblem = () => this._procSimple(...TE_FILES[te]);
-      // logo brush font must be ready before the first frame bakes glyph sprites
-      jobs.brushfont = async () => {
-        await Promise.race([document.fonts.load('90px KouzanBrush'), new Promise(r => setTimeout(r, 2500))]);
-        return true;
-      };
-    }
-    if (this.variant.tbg) jobs.tbg = () => this._procTitleBg(...TBG_FILES[tbg]);
+    const te = TE_FILES[q.get('te')] ? q.get('te') : 'zangetsu';
+    const tbg = TBG_FILES[q.get('tbg')] ? q.get('tbg') : 'gate';
+    this.variant = { te, tbg };
+    jobs.temblem = () => this._procSimple(...TE_FILES[te]);
+    jobs.tbg = () => this._procTitleBg(...TBG_FILES[tbg]);
+    // logo brush font must be ready before the first frame bakes glyph sprites
+    jobs.brushfont = async () => {
+      await Promise.race([document.fonts.load('90px KouzanBrush'), new Promise(r => setTimeout(r, 2500))]);
+      return true;
+    };
 
     for (const [k, fn] of Object.entries(jobs)) {
       try { this.ua[k] = await fn(); }
