@@ -138,14 +138,16 @@ const UI = {
 
   // size-matched select/result bust (320x344, faces pre-aligned). Draws head+
   // shoulders into (rx,ry,rw,rh) clipped; falls back to the sprite preview.
-  drawBust(ctx, cid, rx, ry, rw, rh, dim) {
+  // zoom > 1 scales around the window center (hover feedback).
+  drawBust(ctx, cid, rx, ry, rw, rh, dim, zoom = 1) {
     const art = cid === 'kenji' ? this.ua.selkenji : this.ua.selmack;
     if (!art) { this.drawCharPreview(ctx, cid, rx + rw / 2, ry + rh + 40, 2.25, 0, 'idle', cid === 'mack'); return; }
-    const s = rw / 320;                 // fit width; art is 320 wide
+    const s = rw / 320 * zoom;          // fit width; art is 320 wide
+    const ox = (320 * s - rw) / 2;
     ctx.save();
     ctx.beginPath(); ctx.rect(rx, ry, rw, rh); ctx.clip();
     if (dim) ctx.filter = 'brightness(0.66) saturate(0.85)';
-    ctx.drawImage(art, rx, ry, 320 * s, 344 * s);
+    ctx.drawImage(art, rx - ox, ry - ox * 344 / 320, 320 * s, 344 * s);
     ctx.restore();
   },
 
@@ -193,20 +195,23 @@ const UI = {
       if (f.dispHp < f.hp) f.dispHp = f.hp;
     }
 
-    this.healthBar(ctx, G, f1, 116, 470, false);
-    this.healthBar(ctx, G, f2, 554, 908, true);
-    this.guardBar(ctx, G, f1, 116, 470, false);
-    this.guardBar(ctx, G, f2, 554, 908, true);
+    // bars start clear of the portrait frames' gold overhang (was colliding)
+    this.healthBar(ctx, G, f1, 136, 470, false);
+    this.healthBar(ctx, G, f2, 554, 888, true);
+    this.guardBar(ctx, G, f1, 136, 470, false);
+    this.guardBar(ctx, G, f2, 554, 888, true);
 
-    // portraits: gold-corner lacquer frame asset (tassel mirrored to the outside)
+    // portraits: gold-corner lacquer frame asset (tassel mirrored to the
+    // outside); face art = square crops of the select busts, sprite-crop fallback
     const P = this.ua.portrait;
     for (const [f, px, mir] of [[f1, 12, true], [f2, 924, false]]) {
       const shakeX = f.flash > 0 ? (Math.random() * 4 - 2) : 0;
+      const face = (f.c.id === 'kenji' ? this.ua.hudkenji : this.ua.hudmack) || this.portraits[f.c.id];
       if (P) {
         const s = 86 / P.inner.w;
         ctx.fillStyle = f.c.theme;
         ctx.fillRect(px + shakeX, 10, 88, 88);
-        ctx.drawImage(this.portraits[f.c.id], px + 2 + shakeX, 12, 84, 84);
+        ctx.drawImage(face, px + 2 + shakeX, 12, 84, 84);
         ctx.save();
         if (mir) {
           const cm = px + 44 + shakeX;
@@ -221,13 +226,13 @@ const UI = {
         ctx.fillRect(px - 2 + shakeX, 8, 92, 92);
         ctx.fillStyle = f.c.theme;
         ctx.fillRect(px + shakeX, 10, 88, 88);
-        ctx.drawImage(this.portraits[f.c.id], px + 2 + shakeX, 12, 84, 84);
+        ctx.drawImage(face, px + 2 + shakeX, 12, 84, 84);
       }
     }
 
     // names
-    this.pixText(ctx, `${f1.c.name} · ${f1.c.cn}`, 118, 66, { size: 12, color: '#efe6d5', outline: true });
-    this.pixText(ctx, `${f2.c.name} · ${f2.c.cn}`, 906, 66, { size: 12, color: '#efe6d5', align: 'right', outline: true });
+    this.pixText(ctx, `${f1.c.name} · ${f1.c.cn}`, 138, 66, { size: 12, color: '#efe6d5', outline: true });
+    this.pixText(ctx, `${f2.c.name} · ${f2.c.cn}`, 886, 66, { size: 12, color: '#efe6d5', align: 'right', outline: true });
     if (G.p2IsAI) this.pixText(ctx, 'CPU', 906, 82, { size: 9, color: '#9a8f78', align: 'right' });
 
     // round pips
@@ -251,6 +256,13 @@ const UI = {
         this.pixText(ctx, String(tsec).padStart(2, '0'), 512, dcy + (pulse ? 11 : 9), {
           size: pulse ? 24 : 20, align: 'center', color: urgent ? '#c22a20' : '#5f2015',
         });
+        if (urgent) { // last-10s red edge pulse
+          ctx.globalAlpha = 0.10 + 0.08 * Math.sin(G.tick * 0.3);
+          ctx.fillStyle = '#c22a20';
+          ctx.fillRect(0, 0, 1024, 5); ctx.fillRect(0, 571, 1024, 5);
+          ctx.fillRect(0, 0, 5, 576); ctx.fillRect(1019, 0, 5, 576);
+          ctx.globalAlpha = 1;
+        }
       }
     } else {
       ctx.fillStyle = '#0c0a09';
@@ -275,9 +287,10 @@ const UI = {
     this.meterBar(ctx, G, f1, 24, false);
     this.meterBar(ctx, G, f2, 700, true);
 
-    // combo counters
-    this.comboCounter(ctx, G, f1, 150, false);
-    this.comboCounter(ctx, G, f2, 874, true);
+    // combo counters — fixed on the attacker's side under their bar, per
+    // fighting-game convention (SF/KOF anchor these, they don't follow chars)
+    this.comboCounter(ctx, G, f1, 136, false);
+    this.comboCounter(ctx, G, f2, 888, true);
 
     // training info bar / key hint bar — auto-sized strips stacked ABOVE the
     // meter labels (y<510) so the bottom rows can never collide or clip
@@ -452,15 +465,15 @@ const UI = {
     if (f.comboPop > 0) f.comboPop -= 0.5;
     const scale = 1 + (f.comboPop > 0 ? f.comboPop / 10 * 0.5 : 0);
     ctx.save();
-    ctx.translate(x, 150);
+    ctx.translate(x, 108); // fixed under the attacker's health bar
     ctx.scale(scale, scale);
     const SP = this.ua.combofx;
     if (SP) { // vermillion ink splash behind the count
-      const d = 108, dir = mirror ? -1 : 1;
-      ctx.drawImage(SP.cv, dir * 20 - d / 2, -18 - d / 2, d, d * SP.h / SP.w);
+      const d = 96, dir = mirror ? -1 : 1;
+      ctx.drawImage(SP.cv, dir * 18 - d / 2, -16 - d / 2, d, d * SP.h / SP.w);
     }
-    this.pixText(ctx, String(f.combo.count), 0, 0, { size: 40, align: mirror ? 'right' : 'left', color: '#ffe27a', outline: true, shadow: 4 });
-    this.pixText(ctx, 'HITS!', mirror ? 2 : -2, 22, { size: 13, align: mirror ? 'right' : 'left', color: '#ff9c3d', outline: true });
+    this.pixText(ctx, String(f.combo.count), 0, 0, { size: 38, align: mirror ? 'right' : 'left', color: '#ffe27a', outline: true, shadow: 4 });
+    this.pixText(ctx, 'HITS', mirror ? 2 : -2, 21, { size: 13, align: mirror ? 'right' : 'left', color: '#ff9c3d', outline: true });
     ctx.restore();
   },
 
@@ -486,6 +499,30 @@ const UI = {
     ctx.drawImage(R.cv, cx - w / 2, cy - h * (R.cyFrac || 0.5), w, h);
   },
 
+  // announcement backdrop, style-switchable (?ann=): 'ink'/'ink2' brush swash,
+  // 'band' cinematic full-width lacquer band, 'plaque' wooden board
+  annBack(ctx, cx, cy, w, mainSize) {
+    if (this.ann === 'band') {
+      const h = mainSize + 38;
+      ctx.fillStyle = 'rgba(10,7,6,0.88)';
+      ctx.fillRect(0, cy - h / 2, 1024, h);
+      ctx.fillStyle = '#8a6a2f';
+      ctx.fillRect(0, cy - h / 2, 1024, 2);
+      ctx.fillRect(0, cy + h / 2 - 2, 1024, 2);
+      ctx.fillStyle = 'rgba(179,43,32,0.8)';
+      ctx.fillRect(0, cy - h / 2 + 3, 1024, 1);
+      ctx.fillRect(0, cy + h / 2 - 4, 1024, 1);
+      return;
+    }
+    if (this.ann === 'plaque') {
+      const h = mainSize + 46;
+      if (this.ua.panel) this.nine(ctx, this.ua.panel, cx - w / 2, cy - h / 2, w, h, 0.22);
+      else this.panel(ctx, cx - w / 2, cy - h / 2, w, h, { accent: '#ffc531' });
+      return;
+    }
+    this.inkStroke(ctx, cx, cy, w);
+  },
+
   // ---- announcements --------------------------------------------------------
   drawAnnounce(ctx, G) {
     const a = G.ann;
@@ -509,11 +546,11 @@ const UI = {
       ctx.restore();
     } else if (a.style === 'round') {
       const slide = Math.max(0, 10 - a.t) * 16;
-      this.inkStroke(ctx, cx, cy - 12, 560); // ink centroid on the text's visual center
+      this.annBack(ctx, cx, cy - 12, 560, 34); // anchored on the text's visual center
       this.pixText(ctx, a.text, cx - slide, cy, { size: 34, align: 'center', color: '#f4f1e8', outline: true, shadow: 5 });
       if (a.sub) this.pixText(ctx, a.sub, cx + slide, cy + 32, { size: 15, align: 'center', color: '#ffc531', outline: true });
     } else { // banner
-      this.inkStroke(ctx, cx, cy - 10, 640);
+      this.annBack(ctx, cx, cy - 10, 640, 30);
       this.pixText(ctx, a.text, cx, cy, { size: 30, align: 'center', color: '#f4f1e8', outline: true, shadow: 5 });
       if (a.sub) this.pixText(ctx, a.sub, cx, cy + 38, { size: 16, align: 'center', color: '#ffc531', outline: true });
     }
@@ -605,8 +642,23 @@ const UI = {
     ctx.fillStyle = `rgba(7,8,12,${(V.tbg && this.ua.tbg) ? 0.38 : 0.78})`;
     ctx.fillRect(0, 0, 1024, 576);
 
-    this.drawCharPreview(ctx, 'mack', 190, 500, 2.4, G.tick, 'idle', true);
-    this.drawCharPreview(ctx, 'kenji', 834, 500, 2.4, G.tick, 'idle', false);
+    // drifting embers instead of floating idle sprites (they had no ground to
+    // stand on over the gate backdrop and read as pasted-in)
+    if (!this._embers) {
+      this._embers = Array.from({ length: 16 }, () => ({
+        x: Math.random() * 1024, y: Math.random() * 576,
+        s: 1 + Math.random() * 2, v: 0.25 + Math.random() * 0.5, ph: Math.random() * 6.28,
+      }));
+    }
+    for (const e of this._embers) {
+      const ex = e.x + Math.sin(G.tick * 0.008 + e.ph) * 34;
+      let ey = (e.y - G.tick * e.v) % 576;
+      if (ey < 0) ey += 576;
+      ctx.globalAlpha = 0.28 + 0.24 * Math.sin(G.tick * 0.05 + e.ph);
+      ctx.fillStyle = e.s > 2 ? '#ffc531' : '#d9a441';
+      ctx.fillRect(ex, ey, e.s, e.s);
+    }
+    ctx.globalAlpha = 1;
 
     ctx.save();
     const bob = Math.sin(G.tick * 0.04) * 4;
@@ -633,7 +685,6 @@ const UI = {
       });
       const subY = Math.min(L.y0 + H + 26, 350);
       this.pixText(ctx, 'SOUL BLADE', 512, subY, { size: 18, align: 'center', color: '#d9a441', outline: true, spacing: 8 });
-      this.pixText(ctx, '- 和風 PIXEL FIGHTING -', 512, subY + 22, { size: 10, align: 'center', color: '#9a8f78', spacing: 4 });
     } else {
       // logo: enso emblem (asset) or rising sun disc + brush title, 和风
       const TE = this.ua.title;
@@ -656,7 +707,8 @@ const UI = {
     ctx.restore();
 
     // menu: lacquered wood boards with a folding-fan cursor
-    const items = ['VS CPU', 'TRAINING · 修行', 'HOW TO PLAY'];
+    // bilingual menu per language policy: EN primary + JP kanji accent
+    const items = [['BATTLE', '決闘'], ['TRAINING', '修行'], ['HOW TO PLAY', '心得']];
     const MP = this.ua.panel, FAN = this.ua.cursor;
     items.forEach((it, i) => {
       const sel = G.titleSel === i;
@@ -684,13 +736,21 @@ const UI = {
           this.pixText(ctx, '▶', 352, 407 + i * 42, { size: 16, color: '#ffc531' });
         }
       }
-      this.pixText(ctx, it, 512, 405 + i * 42, {
-        size: 16, align: 'center', color: sel ? '#ffe27a' : (MP ? '#b3a68d' : '#9aa3bd'), outline: sel,
+      // EN + JP drawn as one optically centered line, baseline-middle so both
+      // scripts sit dead center of the board regardless of font metrics
+      const [en, jp] = it;
+      const enW = this.textW(ctx, en, 16), jpW = this.textW(ctx, jp, 16);
+      const gap = 14, total = enW + gap + jpW;
+      const cyRow = by + bh / 2 + 1;
+      this.pixText(ctx, en, 512 - total / 2, cyRow, {
+        size: 16, baseline: 'middle', color: sel ? '#ffe27a' : (MP ? '#b3a68d' : '#9aa3bd'), outline: sel,
+      });
+      this.pixText(ctx, jp, 512 - total / 2 + enW + gap, cyRow, {
+        size: 16, baseline: 'middle', color: sel ? '#ffc531' : '#8a6a2f', outline: sel,
       });
     });
 
     this.pixText(ctx, 'W/S SELECT · J OK · M MUTE', 512, 520, { size: 12, align: 'center', color: '#5d6784' });
-    this.pixText(ctx, 'sprites: LuizMelo (itch.io free) · stage & UI art: gemini pixel gen', 512, 556, { size: 9, align: 'center', color: '#4a4136' });
   },
 
   // ---- controls / tutorial ------------------------------------------------------
@@ -705,7 +765,9 @@ const UI = {
     }
     if (this.ua.panel) this.nine(ctx, this.ua.panel, 62, 40, 900, 496, 0.28);
     else this.panel(ctx, 62, 40, 900, 496, { accent: '#ffc531' });
-    this.pixText(ctx, 'HOW TO PLAY · 操作', 512, 84, { size: 24, align: 'center', color: '#ffe27a', outline: true });
+    // bilingual screen title: JP kanji emphasized, EN beneath (global pattern)
+    this.pixText(ctx, '心得', 512, 80, { size: 26, align: 'center', color: '#ffe27a', outline: true });
+    this.pixText(ctx, 'HOW TO PLAY', 512, 100, { size: 11, align: 'center', color: '#9a8f78', spacing: 4 });
 
     // two columns with hard width budgets: col1 desc 252..516, col2 desc 700..934;
     // every line carries maxW so nothing can collide with keycaps or the panel edge
@@ -759,8 +821,10 @@ const UI = {
 
   // ---- character select ------------------------------------------------------------
   drawSelect(ctx, G) {
-    ctx.drawImage(this.bgCanvas(G), 0, 0);
-    ctx.fillStyle = 'rgba(7,8,12,0.84)';
+    // ?selbg=moon preview: calm moonlit courtyard distinct from the fight dusk
+    const selBg = this.selbg && this.ua.selmoon;
+    ctx.drawImage(selBg ? this.ua.selmoon.cv : this.bgCanvas(G), 0, 0);
+    ctx.fillStyle = `rgba(7,8,12,${selBg ? 0.45 : 0.84})`;
     ctx.fillRect(0, 0, 1024, 576);
 
     const s = G.select;
@@ -774,10 +838,11 @@ const UI = {
       ctx.fillStyle = '#8a6a2f';
       ctx.fillRect(0, 150, 1024, 2);
       ctx.fillRect(0, 428, 1024, 2);
-      this.drawCharPreview(ctx, s.p1, 250 - off, 430, 2.6, G.tick, 'idle', true);
-      this.drawCharPreview(ctx, s.p2, 774 + off, 430, 2.6, G.tick, 'idle', false);
-      this.pixText(ctx, DATA[s.p1].name, 250 - off, 480, { size: 22, align: 'center', color: DATA[s.p1].theme, outline: true });
-      this.pixText(ctx, DATA[s.p2].name, 774 + off, 480, { size: 22, align: 'center', color: DATA[s.p2].theme, outline: true });
+      // matched busts instead of tiny floor-less idle sprites
+      this.drawBust(ctx, s.p1, 118 - off, 158, 264, 232, false, 1);
+      this.drawBust(ctx, s.p2, 642 + off, 158, 264, 232, false, 1);
+      this.pixText(ctx, `${DATA[s.p1].name} · ${DATA[s.p1].cn}`, 250 - off, 480, { size: 20, align: 'center', color: DATA[s.p1].theme, outline: true });
+      this.pixText(ctx, `${DATA[s.p2].name} · ${DATA[s.p2].cn}`, 774 + off, 480, { size: 20, align: 'center', color: DATA[s.p2].theme, outline: true });
       const vsScale = 1 + Math.max(0, 12 - t) * 0.3;
       const VE = this.ua.vs;
       ctx.save(); ctx.translate(512, 290); ctx.scale(vsScale, vsScale);
@@ -815,7 +880,7 @@ const UI = {
         });
       }
       // matched bust portrait (head+shoulders) in the upper panel
-      this.drawBust(ctx, cid, x + 8, 122, 304, 202, !(hovered || chosen));
+      this.drawBust(ctx, cid, x + 8, 122, 304, 202, !(hovered || chosen), hovered ? 1.04 : 1);
       // theme divider + nameplate under the art
       ctx.fillStyle = c.theme;
       ctx.globalAlpha = hovered || chosen ? 1 : 0.5;
@@ -823,11 +888,13 @@ const UI = {
       ctx.globalAlpha = 1;
       const NP = this.ua.nameplate;
       if (NP) ctx.drawImage(NP.cv, x + 44, 328, 232, 232 * NP.h / NP.w);
-      this.pixText(ctx, c.name, x + 168, 350, { size: 20, align: 'center', color: hovered || chosen ? c.theme : '#c9bfa8', outline: true });
-      this.pixText(ctx, `${c.cn} · ${c.title}`, x + 160, 376, { size: 13, align: 'center', color: '#efe6d5' });
+      // name = EN + JP on one plate-centered line (policy: names bilingual);
+      // attributes below stay English-only
+      this.pixText(ctx, `${c.name} · ${c.cn}`, x + 160, 350, { size: 16, align: 'center', color: hovered || chosen ? c.theme : '#c9bfa8', outline: true, maxW: 214 });
+      this.pixText(ctx, c.title, x + 160, 376, { size: 13, align: 'center', color: '#efe6d5' });
       this.pixText(ctx, `${c.type} TYPE`, x + 160, 393, { size: 10, align: 'center', color: '#9a8f78', spacing: 2 });
-      this.statBar(ctx, x + 74, 406, '力', c.stats.pow, c.theme);
-      this.statBar(ctx, x + 74, 424, '速', c.stats.spd, c.theme);
+      this.statBar(ctx, x + 66, 406, 'POW', c.stats.pow, c.theme);
+      this.statBar(ctx, x + 66, 424, 'SPD', c.stats.spd, c.theme);
       if (hovered && G.tick % 30 < 20) {
         this.pixText(ctx, '▼', x + 160, 112, { size: 16, align: 'center', color: '#ffc531' });
       }
@@ -884,7 +951,7 @@ const UI = {
     this.drawBust(ctx, winner.c.id, 384, 246, 256, 190, false);
 
     const RB = this.ua.announce;
-    if (RB) this.inkStroke(ctx, 512, 114, 640); // ink centroid on VICTORY's visual center
+    if (RB) this.annBack(ctx, 512, 114, 640, 46); // anchored on VICTORY's visual center
     this.pixText(ctx, playerWon ? 'VICTORY' : 'DEFEAT', 512, 130, {
       size: 46, align: 'center', color: playerWon ? '#ffc531' : '#f4ead6', outline: true, shadow: 6, spacing: 6,
     });
@@ -892,8 +959,13 @@ const UI = {
 
     if (this.ua.panel) this.nine(ctx, this.ua.panel, 312, 428, 400, 62, 0.14);
     else this.panel(ctx, 312, 428, 400, 62, { accent: winner.c.theme });
-    this.pixText(ctx, `${winner.c.cn}:「${winner.c.quoteWin}」`, 512, 466, {
-      size: 14, align: 'center', color: '#dfe4f2',
+    // victory quotes in Japanese-flavored English (UI-layer table; data.js untouched)
+    const QUOTES_EN = {
+      mack: 'The blade... returns to its sheath.',
+      kenji: '...Too slow.',
+    };
+    this.pixText(ctx, `${winner.c.name}: "${QUOTES_EN[winner.c.id] || winner.c.quoteWin}"`, 512, 466, {
+      size: 14, align: 'center', color: '#dfe4f2', maxW: 370,
     });
 
     this.pixText(ctx, `MAX COMBO: ${G.stats.maxCombo} HITS`, 512, RB ? 236 : 218, { size: 13, align: 'center', color: '#9aa3bd' });
@@ -908,12 +980,18 @@ const UI = {
     if (G.pauseView === 'keys') { this.drawControls(ctx, G, true); return; }
     ctx.fillStyle = 'rgba(7,8,12,0.7)';
     ctx.fillRect(0, 0, 1024, 576);
-    if (this.ua.panel) this.nine(ctx, this.ua.panel, 362, 200, 300, 176, 0.2);
-    else this.panel(ctx, 362, 200, 300, 176, { accent: '#ffc531' });
-    this.pixText(ctx, 'PAUSED · 一時停止', 512, 246, { size: 20, align: 'center', color: '#ffe27a', outline: true });
-    this.pixText(ctx, 'J  RESUME', 512, 292, { size: 15, align: 'center', color: '#dfe4f2' });
-    this.pixText(ctx, 'K  HOW TO PLAY', 512, 320, { size: 15, align: 'center', color: '#dfe4f2' });
-    this.pixText(ctx, 'ESC  QUIT TO TITLE', 512, 348, { size: 15, align: 'center', color: '#9aa3bd' });
+    if (this.ua.panel) this.nine(ctx, this.ua.panel, 352, 178, 320, 220, 0.2);
+    else this.panel(ctx, 352, 178, 320, 220, { accent: '#ffc531' });
+    // bilingual screen title: JP kanji emphasized, EN beneath (global pattern)
+    this.pixText(ctx, '一時停止', 512, 226, { size: 22, align: 'center', color: '#ffe27a', outline: true });
+    this.pixText(ctx, 'PAUSED', 512, 246, { size: 10, align: 'center', color: '#9a8f78', spacing: 4 });
+    const rows = [['J', 'RESUME'], ['K', 'HOW TO PLAY'], ['ESC', 'QUIT TO TITLE']];
+    let ry = 262;
+    for (const [k, label] of rows) {
+      this.keycap(ctx, 396, ry, Math.max(38, k.length * 13 + 16), k);
+      this.pixText(ctx, label, 458, ry + 25, { size: 13, color: '#dfe4f2', maxW: 190 });
+      ry += 44;
+    }
   },
 
   // ==== 和风 asset pipeline ===================================================
@@ -938,6 +1016,9 @@ const UI = {
       // size-matched character-select busts (pre-composed transparent, 320x344)
       selmack:  () => this._loadImg('portrait-hayato-sel.png'),
       selkenji: () => this._loadImg('portrait-kenji-sel.png'),
+      // square face crops of the same busts for the battle HUD (168px → 84)
+      hudmack:  () => this._loadImg('portrait-hayato-hud.png'),
+      hudkenji: () => this._loadImg('portrait-kenji-hud.png'),
       pipmon:   () => this._procSimple('pip-mon.png'),           // round-win crest
       combofx:  () => this._procSimple('combo-splash.png'),      // combo backdrop
       nameplate:() => this._procSimple('nameplate.png'),         // name bar (knot on left)
@@ -960,6 +1041,12 @@ const UI = {
       await Promise.race([document.fonts.load('90px KouzanBrush'), new Promise(r => setTimeout(r, 2500))]);
       return true;
     };
+    // announcement-backdrop style preview (?ann=band|plaque|ink2; default ink)
+    this.ann = ['band', 'plaque', 'ink2'].includes(q.get('ann')) ? q.get('ann') : 'ink';
+    if (this.ann === 'ink2') jobs.announce = () => this._procSimple('announce-brush-slim.png').then(t => this._inkCentroid(t));
+    // select-screen dedicated background preview (?selbg=moon)
+    this.selbg = q.get('selbg') === 'moon';
+    if (this.selbg) jobs.selmoon = () => this._procTitleBg('titlebg-moon.png', 40);
 
     for (const [k, fn] of Object.entries(jobs)) {
       try { this.ua[k] = await fn(); }

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>刀魂 · R6 审阅页 — Eric 8 条 + Fable 自检</title>
+<style>
+  body { margin:0; background:#14100d; color:#efe6d5; font:14px/1.75 "PingFang SC", monospace; }
+  header { padding:22px 30px 10px; border-bottom:2px solid #3a2d1c; }
+  h1 { margin:0; font-size:21px; color:#d9a441; }
+  h2 { font-size:17px; color:#d9a441; border-left:4px solid #b32b20; padding-left:10px; margin:34px 0 6px; }
+  .sub { color:#9a8f78; font-size:12px; }
+  section { padding:6px 30px 10px; }
+  .card { background:#1b1512; border:2px solid #3a2d1c; margin:14px 0; }
+  .card .hd { padding:8px 16px; border-bottom:1px solid #3a2d1c; }
+  .card .hd b { color:#ffe27a; font-size:15px; }
+  .card .bd { padding:10px 16px 14px; color:#c9bfa8; font-size:13px; }
+  .card img { max-width:100%; display:block; background:#000; }
+  .done { color:#7ec97e; font-weight:bold; }
+  .pick { color:#ff9c3d; font-weight:bold; }
+  .warn { color:#e06c5a; font-weight:bold; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  table { border-collapse:collapse; width:100%; font-size:13px; }
+  td, th { border:1px solid #3a2d1c; padding:6px 10px; text-align:left; vertical-align:top; }
+  th { color:#d9a441; background:#1b1512; }
+  code { background:#241c16; padding:1px 6px; color:#ffc531; font-size:12px; }
+  .num { display:inline-block; background:#b32b20; color:#fff; min-width:22px; text-align:center; margin-right:8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>刀魂 · R6 审阅页</h1>
+  <div class="sub">上半部 = 你的 8 条反馈（能直接做的已实装并附截图验证）；下半部 = Fable 自检（平庸点 / 精品机会 / 体验）。最底部是「拍板清单」——你逐项回复编号即可，我收到后直接实装。所有截图为真实运行画面。</div>
+</header>
+
+<section>
+<h2>一、你的 8 条反馈 — 处理状态</h2>
+<table>
+<tr><th>#</th><th>问题</th><th>状态</th><th>说明</th></tr>
+<tr><td>1</td><td>双语规范（EN 为主 + JP 点缀）</td><td class="done">✅ 已实装</td><td>全局落地：屏幕大标题 = JP 汉字为主 + EN 小字（選べ、己の剣 / 心得 / 一時停止）；人物名 = EN·JP 并排；属性 POW/SPD、操作条、菜单说明全英文</td></tr>
+<tr><td>2</td><td>标题菜单：居中 / VS CPU 太傻 / 副标题 / 署名 / 站桩小人</td><td class="done">✅ 已实装</td><td>菜单改 <b>BATTLE 決闘 / TRAINING 修行 / HOW TO PLAY 心得</b>，EN+JP 光学居中、baseline-middle 垂直居中；副标题已删；<b>LuizMelo 素材为 CC0、署名非必需</b>（已核实 itch.io 页），署名行已删；两个站桩小人已移除，换成飘浮余烬粒子（他们在城门背景上没有地面线，看着像贴上去的）</td></tr>
+<tr><td>3</td><td>选人头像大小不一致 / 名字错位</td><td class="done">✅ 已实装</td><td>两张立绘按视觉脸高重新归一（三轮校准），眼线同高；名字改为「HAYATO · 隼人」单行居中于名牌，副行只留称号</td></tr>
+<tr><td>4</td><td>暂停界面双语混乱</td><td class="done">✅ 已实装</td><td>统一为全局模式：一時停止（大）+ PAUSED（小）竖排，选项改键帽图示</td></tr>
+<tr><td>5</td><td>HUD 血条撞人像框 / 用精致画像</td><td class="done">✅ 已实装</td><td>血条起点让出人像框金角（136/888）；头像改用立绘的方形脸部切片（白面浪人 / 赤鬼面清晰可辨）</td></tr>
+<tr><td>6</td><td>大墨痕丑 / 连击位置</td><td class="pick">🔲 待拍板</td><td>做了 4 种公告风格实机对比（见下节）；连击计数按业界惯例（SF/KOF：出招方一侧固定位，不跟随角色）锚定到血条正下方 y=108，缩小并加泼墨底</td></tr>
+<tr><td>7</td><td>结算屏：台词英语化 / 构图</td><td class="done">✅ 已实装</td><td>台词换日式英语：HAYATO: "The blade... returns to its sheath." / KENJI: "...Too slow."（UI 层翻译表，不动 data.js）；构图随公告风格一起看下节对比</td></tr>
+<tr><td>8</td><td>防御蓝矩形太糙</td><td class="warn">⚠ 需授权</td><td>确认画在 <code>fighter.js</code> 尾部（硬边界文件）。设计已备好：半月弧形气浪（三层弧线：外晕/主弧/内亮边，格挡瞬间弹出扩散涟漪），朝向对手开口。<b>需要动 fighter.js 尾部约 15 行纯视觉代码，与主线冲突风险低——你说「准」我就动</b></td></tr>
+</table>
+
+<div class="grid2">
+<div class="card"><div class="hd"><b>标题屏（新菜单 + 余烬 + 无署名）</b></div><img src="mockups/r6/r01-title.png"></div>
+<div class="card"><div class="hd"><b>选人屏（归一立绘 + EN·JP 名牌 + POW/SPD）</b></div><img src="mockups/r6/r02-select.png"></div>
+<div class="card"><div class="hd"><b>战斗 HUD（立绘头像 + 让位血条 + 家纹）</b></div><img src="mockups/r6/r05-hud.png"></div>
+<div class="card"><div class="hd"><b>暂停（一時停止 / PAUSED + 键帽）</b></div><img src="mockups/r6/r06-pause.png"></div>
+<div class="card"><div class="hd"><b>VS 过场（大立绘对峙，替代小站桩）</b></div><img src="mockups/r6/r04-vs.png"></div>
+<div class="card"><div class="hd"><b>选人屏 · 月夜背景版（拍板项 C）</b></div><img src="mockups/r6/r03-select-moon.png"></div>
+</div>
+</section>
+
+<section>
+<h2>二、公告风格 4 选 1（拍板项 A）— 同一结算屏实机对比</h2>
+<div class="grid2">
+<div class="card"><div class="hd"><b>A1 · 墨痕（现状）</b></div><img src="mockups/r6/r07-result-ink.png"><div class="bd">你已表态不喜欢。保留作对照。</div></div>
+<div class="card"><div class="hd"><b>A2 · 漆金横带（我的推荐）</b></div><img src="mockups/r6/r08-result-band.png"><div class="bd">全宽漆黑带 + 金线 + 朱线，电影字幕感，最干净、和 HUD 语言一致。ROUND/KO 公告同样式（见 r11）。</div></div>
+<div class="card"><div class="hd"><b>A3 · 木牌匾</b></div><img src="mockups/r6/r09-result-plaque.png"><div class="bd">与菜单木牌同族，实体感强，稍重。</div></div>
+<div class="card"><div class="hd"><b>A4 · 细墨痕</b></div><img src="mockups/r6/r10-result-ink2.png"><div class="bd">7:1 细长笔锋版墨痕，比 A1 收敛。</div></div>
+</div>
+<div class="card"><div class="hd"><b>A2 带状风格在 ROUND 1 公告上的效果</b></div><img src="mockups/r6/r11-round-band.png"></div>
+<div class="sub">实机切换：任意页面 URL 加 <code>&ann=band</code> / <code>&ann=plaque</code> / <code>&ann=ink2</code>（默认 ink）。</div>
+</section>
+
+<section>
+<h2>三、Fable 自检清单</h2>
+
+<h3 style="color:#7ec97e">3.1 自检中顺手实装的（无口味争议）</h3>
+<table>
+<tr><td>倒计时最后 10 秒</td><td>屏幕四边红晕脉冲——紧张感反馈，此前只有数字变色</td></tr>
+<tr><td>选人 hover</td><td>立绘微放大 1.04 + 高亮——此前只有亮度差，反馈太弱</td></tr>
+<tr><td>连击计数</td><td>调查结论：SF/KOF 均为「出招方一侧固定位」；已锚定到血条正下，缩小字号加泼墨底</td></tr>
+<tr><td>HOW TO PLAY 标题</td><td>改「心得」大字 + EN 小字，与全局双语模式统一</td></tr>
+</table>
+
+<h3 style="color:#ff9c3d">3.2 平庸点自评（可以做得更好，待你点头排期）</h3>
+<table>
+<tr><th>#</th><th>项</th><th>现状 / 提升方案</th></tr>
+<tr><td>B1</td><td>屏幕切换硬切</td><td>所有屏是瞬间跳转，很廉价。方案：20tick 墨色淡入过渡（ui.js 检测 G.screen 变化叠加渐隐黑幕），零主线依赖。<b>强烈推荐</b></td></tr>
+<tr><td>B2</td><td>难度选择光标</td><td>三块小木牌选中态只有亮度差；补折扇光标与标题菜单一致</td></tr>
+<tr><td>B3</td><td>标题 logo 静态</td><td>只有上下浮动；可加斩痕金粒偶发闪烁（余烬已加，这是锦上添花）</td></tr>
+<tr><td>B4</td><td>结算屏战报单薄</td><td>只有 MAX COMBO 一行；引擎 G.stats 目前只记这一项，扩展需动 main.js（主线协调，挂账）</td></tr>
+<tr><td>B5</td><td>VS 过场静态</td><td>已换大立绘；可再加中央斜切分割线 + 速度线拉出对峙张力（纯 ui.js）</td></tr>
+</table>
+
+<h3 style="color:#e06c5a">3.3 已知边界外欠账（需主线协调，仅记录）</h3>
+<table>
+<tr><td>KO 慢镜/镜头微震</td><td>main.js 回合状态机，本分支不动</td></tr>
+<tr><td>防御音效 / 菜单音效细分</td><td>audio.js 禁区</td></tr>
+<tr><td>战报数据扩展</td><td>见 B4</td></tr>
+</table>
+</section>
+
+<section>
+<h2>四、拍板清单（回复编号即可）</h2>
+<table>
+<tr><th>项</th><th>问题</th><th>选项</th><th>我的推荐</th></tr>
+<tr><td><span class="num">A</span></td><td>公告风格</td><td>A1 墨痕 / A2 漆金横带 / A3 木牌 / A4 细墨痕</td><td><b>A2</b></td></tr>
+<tr><td><span class="num">B</span></td><td>防御冲击波（动 fighter.js 15 行）</td><td>准 / 不准</td><td><b>准</b></td></tr>
+<tr><td><span class="num">C</span></td><td>选人屏月夜背景</td><td>用 / 维持暗化黄昏</td><td><b>用</b>（与战斗黄昏形成节奏差）</td></tr>
+<tr><td><span class="num">D</span></td><td>屏幕过渡淡入（B1）</td><td>做 / 不做</td><td><b>做</b></td></tr>
+<tr><td><span class="num">E</span></td><td>B2/B3/B5 小提升</td><td>全做 / 挑着做 / 不做</td><td><b>全做</b>（都是纯 ui.js 小改）</td></tr>
+<tr><td><span class="num">F</span></td><td>BATTLE·決闘 命名</td><td>OK / 换（备选：出陣 / 対戦）</td><td><b>OK</b></td></tr>
+</table>
+<div class="sub" style="padding:8px 0 30px">例：回复「A2 B准 C用 D做 E全做 F OK」，我直接开工并全部实装。</div>
+</section>
+</body>
+</html>
