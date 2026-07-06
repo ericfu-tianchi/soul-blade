@@ -230,10 +230,10 @@ const UI = {
       }
     }
 
-    // names
-    this.pixText(ctx, `${f1.c.name} · ${f1.c.cn}`, 138, 66, { size: 12, color: '#efe6d5', outline: true });
-    this.pixText(ctx, `${f2.c.name} · ${f2.c.cn}`, 886, 66, { size: 12, color: '#efe6d5', align: 'right', outline: true });
-    if (G.p2IsAI) this.pixText(ctx, 'CPU', 906, 82, { size: 9, color: '#9a8f78', align: 'right' });
+    // names (right one pulled clear of the hp-frame end-scroll ornament)
+    this.pixText(ctx, `${f1.c.name} · ${f1.c.cn}`, 138, 70, { size: 12, color: '#efe6d5', outline: true });
+    this.pixText(ctx, `${f2.c.name} · ${f2.c.cn}`, 862, 70, { size: 12, color: '#efe6d5', align: 'right', outline: true });
+    if (G.p2IsAI) this.pixText(ctx, 'CPU', 862, 86, { size: 9, color: '#9a8f78', align: 'right' });
 
     // round pips
     for (let i = 0; i < 2; i++) {
@@ -503,37 +503,34 @@ const UI = {
   // 'band' cinematic full-width lacquer band, 'plaque' wooden board
   annBack(ctx, cx, cy, w, mainSize) {
     if (this.ann === 'band') {
-      // ornamented lacquer band: gradient body, double gold + red hairlines,
-      // kamon crest medallions flanking, corner notches
-      const h = mainSize + 46, top = cy - h / 2;
-      const gr = ctx.createLinearGradient(0, top, 0, top + h);
-      gr.addColorStop(0, 'rgba(18,12,9,0.94)');
-      gr.addColorStop(0.5, 'rgba(8,5,4,0.94)');
-      gr.addColorStop(1, 'rgba(18,12,9,0.94)');
-      ctx.fillStyle = gr;
-      ctx.fillRect(0, top, 1024, h);
-      ctx.fillStyle = '#c9a24b';
-      ctx.fillRect(0, top, 1024, 2);
-      ctx.fillRect(0, top + h - 2, 1024, 2);
+      const h = mainSize + 44;
+      ctx.fillStyle = 'rgba(10,7,6,0.9)';
+      ctx.fillRect(0, cy - h / 2, 1024, h);
+      // double gold frame + inner vermillion hairline
       ctx.fillStyle = '#8a6a2f';
-      ctx.fillRect(0, top + 4, 1024, 1);
-      ctx.fillRect(0, top + h - 5, 1024, 1);
+      ctx.fillRect(0, cy - h / 2, 1024, 2);
+      ctx.fillRect(0, cy + h / 2 - 2, 1024, 2);
+      ctx.fillStyle = '#d9a441';
+      ctx.fillRect(0, cy - h / 2 + 4, 1024, 1);
+      ctx.fillRect(0, cy + h / 2 - 5, 1024, 1);
       ctx.fillStyle = 'rgba(179,43,32,0.85)';
-      ctx.fillRect(0, top + 6, 1024, 1);
-      ctx.fillRect(0, top + h - 7, 1024, 1);
+      ctx.fillRect(0, cy - h / 2 + 7, 1024, 1);
+      ctx.fillRect(0, cy + h / 2 - 8, 1024, 1);
+      // kamon medallions flanking the text, diamond accents trailing out
       const M = this.ua.pipmon;
-      if (M) {
-        const d = Math.min(38, h - 20), mh = d * M.h / M.w;
-        ctx.globalAlpha = 0.92;
-        ctx.drawImage(M.cv, 76 - d / 2, cy - mh / 2, d, mh);
-        ctx.drawImage(M.cv, 948 - d / 2, cy - mh / 2, d, mh);
-        ctx.globalAlpha = 1;
-        // small gold diamonds inside the crests
-        for (const nx of [136, 888]) {
+      const mx = w / 2 + 24;
+      for (const dir of [-1, 1]) {
+        if (M) {
+          const d = 34, mh = d * M.h / M.w;
+          ctx.drawImage(M.cv, cx + dir * mx - d / 2, cy - mh / 2, d, mh);
+        }
+        ctx.fillStyle = '#8a6a2f';
+        for (let i = 1; i <= 3; i++) {
+          const s2 = 5 - i;
           ctx.save();
-          ctx.translate(nx, cy); ctx.rotate(Math.PI / 4);
-          ctx.fillStyle = '#c9a24b'; ctx.fillRect(-4, -4, 8, 8);
-          ctx.fillStyle = '#5a1210'; ctx.fillRect(-2, -2, 4, 4);
+          ctx.translate(cx + dir * (mx + 26 + i * 24), cy);
+          ctx.rotate(Math.PI / 4);
+          ctx.fillRect(-s2, -s2, s2 * 2, s2 * 2);
           ctx.restore();
         }
       }
@@ -571,13 +568,14 @@ const UI = {
       ctx.restore();
     } else if (a.style === 'round') {
       const slide = Math.max(0, 10 - a.t) * 16;
-      this.annBack(ctx, cx, cy - 12, 560, 34); // anchored on the text's visual center
-      this.pixText(ctx, a.text, cx - slide, cy, { size: 34, align: 'center', color: '#f4f1e8', outline: true, shadow: 5 });
-      if (a.sub) this.pixText(ctx, a.sub, cx + slide, cy + 32, { size: 15, align: 'center', color: '#ffc531', outline: true });
+      // band center = cy-12; baseline = center + 0.42em so text sits dead center
+      this.annBack(ctx, cx, cy - 12, 560, 34);
+      this.pixText(ctx, a.text, cx - slide, cy + 2, { size: 34, align: 'center', color: '#f4f1e8', outline: true, shadow: 5 });
+      if (a.sub) this.pixText(ctx, a.sub, cx + slide, cy + 40, { size: 15, align: 'center', color: '#ffc531', outline: true });
     } else { // banner
       this.annBack(ctx, cx, cy - 10, 640, 30);
-      this.pixText(ctx, a.text, cx, cy, { size: 30, align: 'center', color: '#f4f1e8', outline: true, shadow: 5 });
-      if (a.sub) this.pixText(ctx, a.sub, cx, cy + 38, { size: 16, align: 'center', color: '#ffc531', outline: true });
+      this.pixText(ctx, a.text, cx, cy + 3, { size: 30, align: 'center', color: '#f4f1e8', outline: true, shadow: 5 });
+      if (a.sub) this.pixText(ctx, a.sub, cx, cy + 42, { size: 16, align: 'center', color: '#ffc531', outline: true });
     }
     ctx.globalAlpha = 1;
   },
@@ -770,8 +768,7 @@ const UI = {
       this.pixText(ctx, en, 512 - total / 2, cyRow, {
         size: 16, baseline: 'middle', color: sel ? '#ffe27a' : (MP ? '#b3a68d' : '#9aa3bd'), outline: sel,
       });
-      // JP glyphs in FusionPixelJA sit lower than PressStart at the same
-      // middle-baseline — lift 3px so both scripts share the optical center
+      // FusionPixel kanji hang lower in the em than PressStart caps — lift 3px
       this.pixText(ctx, jp, 512 - total / 2 + enW + gap, cyRow - 3, {
         size: 16, baseline: 'middle', color: sel ? '#ffc531' : '#8a6a2f', outline: sel,
       });
@@ -915,12 +912,11 @@ const UI = {
       ctx.globalAlpha = 1;
       const NP = this.ua.nameplate;
       if (NP) ctx.drawImage(NP.cv, x + 44, 328, 232, 232 * NP.h / NP.w);
-      // name = EN + JP on one plate-centered line (policy: names bilingual);
-      // no epithet small-print below — just name, type and stats
+      // name = EN + JP only (epithet line dropped per review); attributes EN
       this.pixText(ctx, `${c.name} · ${c.cn}`, x + 160, 350, { size: 16, align: 'center', color: hovered || chosen ? c.theme : '#c9bfa8', outline: true, maxW: 214 });
-      this.pixText(ctx, `${c.type} TYPE`, x + 160, 381, { size: 10, align: 'center', color: '#9a8f78', spacing: 2 });
-      this.statBar(ctx, x + 66, 398, 'POW', c.stats.pow, c.theme);
-      this.statBar(ctx, x + 66, 418, 'SPD', c.stats.spd, c.theme);
+      this.pixText(ctx, `${c.type} TYPE`, x + 160, 382, { size: 10, align: 'center', color: '#9a8f78', spacing: 2 });
+      this.statBar(ctx, x + 66, 400, 'POW', c.stats.pow, c.theme);
+      this.statBar(ctx, x + 66, 420, 'SPD', c.stats.spd, c.theme);
       if (hovered && G.tick % 30 < 20) {
         this.pixText(ctx, '▼', x + 160, 112, { size: 16, align: 'center', color: '#ffc531' });
       }
@@ -977,25 +973,27 @@ const UI = {
     this.drawBust(ctx, winner.c.id, 384, 246, 256, 190, false);
 
     const RB = this.ua.announce;
-    if (RB || this.ann === 'band') this.annBack(ctx, 512, 114, 640, 46);
-    // baseline = band center + 0.40em puts the cap glyphs dead center of the band
-    this.pixText(ctx, playerWon ? 'VICTORY' : 'DEFEAT', 512, 132, {
+    if (RB) this.annBack(ctx, 512, 114, 640, 46); // band center 114
+    this.pixText(ctx, playerWon ? 'VICTORY' : 'DEFEAT', 512, 133, { // 114 + 0.42em
       size: 46, align: 'center', color: playerWon ? '#ffc531' : '#f4ead6', outline: true, shadow: 6, spacing: 6,
     });
     this.pixText(ctx, playerWon ? '勝利' : '敗北', 512, RB ? 205 : 172, { size: 22, align: 'center', color: '#f4f1e8', outline: true });
 
-    if (this.ua.panel) this.nine(ctx, this.ua.panel, 312, 428, 400, 62, 0.14);
-    else this.panel(ctx, 312, 428, 400, 62, { accent: winner.c.theme });
     // victory quotes in Japanese-flavored English (UI-layer table; data.js untouched)
     const QUOTES_EN = {
       mack: 'The blade... returns to its sheath.',
       kenji: '...Too slow.',
     };
-    this.pixText(ctx, `${winner.c.name}: "${QUOTES_EN[winner.c.id] || winner.c.quoteWin}"`, 512, 466, {
-      size: 14, align: 'center', color: '#dfe4f2', maxW: 370,
+    const quote = `${winner.c.name}: "${QUOTES_EN[winner.c.id] || winner.c.quoteWin}"`;
+    // box hugs the text (long quotes shrank past pixText's size floor and overflowed a fixed box)
+    const qw = Math.min(560, Math.ceil(this.textW(ctx, quote, 13)) + 44);
+    if (this.ua.panel) this.nine(ctx, this.ua.panel, 512 - qw / 2, 428, qw, 62, 0.14);
+    else this.panel(ctx, 512 - qw / 2, 428, qw, 62, { accent: winner.c.theme });
+    this.pixText(ctx, quote, 512, 465, {
+      size: 13, align: 'center', color: '#dfe4f2', maxW: qw - 44,
     });
 
-    this.pixText(ctx, `MAX COMBO: ${G.stats.maxCombo} HITS`, 512, RB ? 236 : 218, { size: 13, align: 'center', color: '#9aa3bd' });
+    this.pixText(ctx, `MAX COMBO: ${G.stats.maxCombo} ${G.stats.maxCombo === 1 ? 'HIT' : 'HITS'}`, 512, RB ? 236 : 218, { size: 13, align: 'center', color: '#9aa3bd' });
 
     this.pixText(ctx, 'J REMATCH · K CHARACTER · ESC TITLE', 512, 530, {
       size: 14, align: 'center', color: G.tick % 40 < 25 ? '#ffe27a' : '#8892ad',
@@ -1068,9 +1066,9 @@ const UI = {
       await Promise.race([document.fonts.load('90px KouzanBrush'), new Promise(r => setTimeout(r, 2500))]);
       return true;
     };
-    // announcement backdrop: DEFAULT = ornamented band (Eric's pick);
-    // ?ann=ink|plaque|ink2 to compare
-    this.ann = ['ink', 'band', 'plaque', 'ink2'].includes(q.get('ann')) ? q.get('ann') : 'band';
+    // announcement backdrop: DEFAULT = decorated lacquer band (Eric's pick);
+    // ?ann=ink|plaque|ink2 keeps the alternatives switchable
+    this.ann = ['ink', 'plaque', 'ink2'].includes(q.get('ann')) ? q.get('ann') : 'band';
     if (this.ann === 'ink2') jobs.announce = () => this._procSimple('announce-brush-slim.png').then(t => this._inkCentroid(t));
     // select-screen dedicated background preview (?selbg=moon)
     this.selbg = q.get('selbg') === 'moon';

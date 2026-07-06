@@ -1,7 +1,6 @@
-"""Round-8: regenerate the select busts AS A PAIR in one canvas — both refs
-passed in, model draws them side-by-side at identical zoom/head-size/shoulder
-mass, then we split. Fixes the inherent composition mismatch (kenji narrow
-with margins vs hayato wide-hat full-bleed)."""
+"""Round-8: matched-PAIR regeneration. Both busts painted in ONE image so the
+model enforces identical zoom / head size / eye-line / area occupancy. Designs
+must stay 100% faithful to the two approved references."""
 import json, base64, urllib.request, os, time
 
 KEY = os.environ['GEMINI_API_KEY']
@@ -10,32 +9,29 @@ URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash
 def b64(p): return base64.b64encode(open(p, 'rb').read()).decode()
 
 PROMPT = (
-    "Draw a TWO-PANEL character-select portrait pair for a fighting game, one canvas split "
-    "into a left half and a right half, both panels painted by the same artist in the same "
-    "16-bit painterly pixel-art style.\n"
-    "LEFT panel: the cloaked swordsman from the FIRST reference image - keep his design 100%: "
-    "wide thin dark-plum lacquered disc hat tilted low, pale mask-like white face, narrow "
-    "glowing RED eyes, crimson scarf knotted at the neck, bone-grey robe.\n"
-    "RIGHT panel: the oni-masked ninja from the SECOND reference image - keep his design 100%: "
-    "red oni mask with gold horns, black spiky hair, indigo shinobi garb, blade on his back.\n"
-    "CRITICAL - the two portraits must be a perfectly MATCHED SET: identical zoom level, "
-    "identical head size, head centers at the same height, similar shoulder width and "
-    "silhouette mass, both head-and-shoulders busts with the same amount of breathing room "
-    "around them, each centered in its own half. Hayato's wide hat may be cropped equally on "
-    "both sides if needed. Both face slightly toward each other (left one faces right, right "
-    "one faces left). Flat near-black background (#0a0a0c) in both panels, a thin 4-pixel "
-    "black gap between panels, no text, no watermark, wide 2:1 composition."
+    "ONE image containing TWO bust portraits side by side as a MATCHED character-select pair "
+    "for the same fighting game. Hard requirements: IDENTICAL zoom, identical head size, "
+    "identical vertical eye-line, and each subject occupies the SAME visual area within his "
+    "half of the canvas, with similar breathing room around both heads.\n"
+    "LEFT half: the cloaked swordsman from the FIRST reference - keep his design exactly: "
+    "wide thin dark-plum lacquered disc hat worn tilted, pale mask-like white face, narrow "
+    "glowing RED eyes, crimson scarf knotted at the neck with trailing tails, bone-grey robe.\n"
+    "RIGHT half: the oni-masked ninja from the SECOND reference - keep his design exactly: "
+    "red oni mask with gold horns, black topknot hair, indigo shinobi garb, blade on back.\n"
+    "Both waist-up, 3/4 view, facing INWARD toward each other. Same painterly 16-bit pixel "
+    "art shading as the references, crisp pixels, flat near-black background (#0a0a0c), no "
+    "text, no watermark, no divider line between the halves.",
 )
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 parts = [
-    {"text": PROMPT},
+    {"text": PROMPT[0]},
     {"inline_data": {"mime_type": "image/png", "data": b64('portrait-hayato-bust.png')}},
     {"inline_data": {"mime_type": "image/png", "data": b64('ref-kenji-bust.png')}},
 ]
 body = json.dumps({"contents": [{"parts": parts}],
                    "generationConfig": {"responseModalities": ["IMAGE"]}}).encode()
-for c in range(1, 4):
+for c in range(1, 5):
     out = f"portrait-pair-c{c}.png"
     if os.path.exists(out):
         print('skip', out); continue
