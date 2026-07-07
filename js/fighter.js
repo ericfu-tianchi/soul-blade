@@ -814,28 +814,27 @@ class Fighter {
     ctx.globalAlpha = 1;
     ctx.restore();
 
-    // guard barrier: clean vertical energy pane, subtle when primed,
-    // bright during blockstun
+    // guard crescent: layered arc shield bulging toward the opponent,
+    // subtle when primed, bright + outward ripple during blockstun
     if (this.state === 'guard' || this.state === 'block') {
       const strong = this.state === 'block';
-      const bx = Math.round(this.x + this.facing * 44);
-      const h = 116, top = this.y - 136;
-      const base = strong ? 0.42 : 0.16 + 0.05 * Math.sin(this.world.tick * 0.25);
-      ctx.globalAlpha = base;
-      ctx.fillStyle = '#7fd8e8';
-      ctx.fillRect(bx - 4, top, 8, h);
-      // bright leading edge toward the opponent
-      ctx.globalAlpha = Math.min(1, base + 0.3);
-      ctx.fillStyle = '#e8fbff';
-      ctx.fillRect(bx + (this.facing > 0 ? 3 : -5), top, 2, h);
-      // caps
-      ctx.fillRect(bx - 7, top - 3, 14, 3);
-      ctx.fillRect(bx - 7, top + h, 14, 3);
-      // travelling shimmer band
-      const sy = top + ((this.world.tick * 4) % h);
-      ctx.globalAlpha = Math.min(1, base + 0.2);
-      ctx.fillStyle = '#bff0fa';
-      ctx.fillRect(bx - 4, sy, 8, Math.min(12, top + h - sy));
+      const cx = this.x + this.facing * 12, cy = this.y - 78;
+      const a0 = this.facing > 0 ? 0 : Math.PI;
+      const base = strong ? 0.5 : 0.18 + 0.06 * Math.sin(this.world.tick * 0.25);
+      ctx.lineCap = 'round';
+      const arc = (r, w, col, al) => {
+        ctx.globalAlpha = Math.max(0, Math.min(1, al));
+        ctx.strokeStyle = col; ctx.lineWidth = w;
+        ctx.beginPath(); ctx.arc(cx, cy, r, a0 - 0.95, a0 + 0.95); ctx.stroke();
+      };
+      arc(56, 12, '#7fd8e8', base * 0.35);             // outer glow
+      arc(56, 4, '#7fd8e8', base);                     // main arc
+      arc(51, 2, '#e8fbff', base + 0.25);              // inner bright edge
+      if (strong && this.blockstun > 0) {              // impact ripple
+        const t = Math.max(0, 14 - this.blockstun);
+        arc(58 + t * 5, 3, '#bff0fa', 0.5 - t * 0.045);
+      }
+      ctx.lineCap = 'butt';
       ctx.globalAlpha = 1;
     }
   }

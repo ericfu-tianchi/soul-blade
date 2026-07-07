@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
 <meta charset="utf-8">
-<title>刀魂 · R6 审阅页 — Eric 8 条 + Fable 自检</title>
+<title>刀魂 · UI 审阅页 — R9</title>
 <style>
   body { margin:0; background:#14100d; color:#efe6d5; font:14px/1.75 "PingFang SC", monospace; }
   header { padding:22px 30px 10px; border-bottom:2px solid #3a2d1c; }
@@ -17,124 +17,51 @@
   .card img { max-width:100%; display:block; background:#000; }
   .done { color:#7ec97e; font-weight:bold; }
   .pick { color:#ff9c3d; font-weight:bold; }
-  .warn { color:#e06c5a; font-weight:bold; }
   .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   table { border-collapse:collapse; width:100%; font-size:13px; }
   td, th { border:1px solid #3a2d1c; padding:6px 10px; text-align:left; vertical-align:top; }
   th { color:#d9a441; background:#1b1512; }
   code { background:#241c16; padding:1px 6px; color:#ffc531; font-size:12px; }
-  .num { display:inline-block; background:#b32b20; color:#fff; min-width:22px; text-align:center; margin-right:8px; }
 </style>
 </head>
 <body>
 <header>
-  <h1>刀魂 · R6 审阅页</h1>
-  <div class="sub">上半部 = 你的 8 条反馈（能直接做的已实装并附截图验证）；下半部 = Fable 自检（平庸点 / 精品机会 / 体验）。最底部是「拍板清单」——你逐项回复编号即可，我收到后直接实装。所有截图为真实运行画面。</div>
+  <h1>刀魂 · UI 审阅页（R9）</h1>
+  <div class="sub">本轮拍板的 B/C/D/E 已全部实装（截图为真实运行画面）；唯一待你拍板的是成组立绘 3 选 1。历史轮次内容已清理。</div>
 </header>
 
-<section style="background:#1e1610">
-<h2>⓪ R7 更新 — 你的第二轮 6 条（最新）</h2>
+<section>
+<h2>一、待拍板：成组立绘 3 选 1（生图模型原生重画）</h2>
+<div class="sub" style="padding-bottom:6px">按你的指示改为整组重新生成：把两人画进同一张图、用同一身体模板出图（同 zoom / 同眼线 / 同头身比），不再做缩放拼接。形象特点全部保留。我推荐 <b>G1</b>。选定后我拆分归一，一次性替换 选人 / VS / 结算 / HUD 四处头像。</div>
+<div class="grid2">
+<div class="card"><div class="hd"><b>G1</b>（<span class="pick">推荐</span>）两人头身比最一致，细节最干净</div><img src="portrait-pair-g1.png"></div>
+<div class="card"><div class="hd"><b>G3</b> 同样合格，隼人脸略小于 G1</div><img src="portrait-pair-g3.png"></div>
+</div>
+<div class="card"><div class="hd"><b>G2</b> 备选：比例也一致，但剣二被画上了头巾罩（原设定是露出黑色束发）</div><img src="portrait-pair-g2.png"></div>
+</section>
+
+<section>
+<h2>二、B/C/D/E 已实装 — 验证截图</h2>
 <table>
-<tr><th>#</th><th>问题</th><th>状态</th><th>说明</th></tr>
-<tr><td>1</td><td>标题菜单日语贴底</td><td class="done">✅ 已修</td><td>FusionPixelJA 与 PressStart 的 middle 基线不一致，日语字上提 3px 对齐光学中心（s1）</td></tr>
-<tr><td>2+4</td><td>选人立绘占比不成组</td><td class="pick">🔲 待拍板 G</td><td>确认是源图构图差异（剣二窄幅留白 vs 隼人宽帽满幅），裁切调不平 → 按你指示<b>重新生成：两人画进同一张图，强制同 zoom / 同头位 / 同眼线</b>。4 张候选见下方，选一张我拆分归一后一次性换掉 选人 / VS / 结算 / HUD 四处头像</td></tr>
-<tr><td>3</td><td>HUD 头像太大没留白</td><td class="done">✅ 已修</td><td>重切：脸占框 ~57%、头顶留白，斗笠帽檐 / 鬼角完整入框（s3）；顺手修了右侧名字撞血条端头卷纹的碰撞</td></tr>
-<tr><td>5</td><td>选人屏白色日语小字</td><td class="done">✅ 已删</td><td>称号行移除，只留「HAYATO · 隼人」名牌 + TYPE + POW/SPD（s2）</td></tr>
-<tr><td>6</td><td>横带要装饰性 + 文字居中</td><td class="done">✅ 已修并设为默认</td><td>漆底 + 双金线 + 朱线，<b>家纹章紧贴文字两侧 + 三粒金菱渐隐拖尾</b>，文字基线重算至带正中（s4/s5）</td></tr>
-<tr><td>+</td><td>自查顺手修</td><td class="done">✅</td><td>结算屏台词框改为随文字自适应宽度（长台词此前溢出边框）；MAX COMBO 单数改 1 HIT</td></tr>
+<tr><th>项</th><th>内容</th><th>状态</th></tr>
+<tr><td>B</td><td>防御冲击波：蓝色矩形 → 半月弧形气浪（外晕/主弧/内亮边三层，朝对手鼓出；格挡瞬间外扩涟漪，持盾预备态为微光呼吸）。fighter.js 尾部纯视觉 ~20 行</td><td class="done">✅ 图1</td></tr>
+<tr><td>C</td><td>选人屏月夜专属背景设为默认（<code>?selbg=dusk</code> 可切回黄昏）</td><td class="done">✅ 图2</td></tr>
+<tr><td>D</td><td>屏幕切换墨色淡入（18 tick 墨幕揭起；截图管线的 ff 快进会自动跳过，故无法截到，进游戏切屏即见）</td><td class="done">✅ 实机看</td></tr>
+<tr><td>E</td><td>难度选择折扇光标（图3）· 标题 logo 偶发金光闪烁（图4，魂字右上）· VS 过场斜切分割线+速度线（图5）</td><td class="done">✅</td></tr>
 </table>
 <div class="grid2">
-<div class="card"><div class="hd"><b>s1 · 标题（日语居中后）</b></div><img src="mockups/r7/s1-title.png"></div>
-<div class="card"><div class="hd"><b>s2 · 选人（删称号小字后）</b></div><img src="mockups/r7/s2-select.png"></div>
-<div class="card"><div class="hd"><b>s3 · HUD（头像留白 + 名字让位后）</b></div><img src="mockups/r7/s3-hud.png"></div>
-<div class="card"><div class="hd"><b>s4 · 结算（装饰横带 + 文字正中 + 自适应台词框）</b></div><img src="mockups/r7/s4-result.png"></div>
+<div class="card"><div class="hd"><b>图1 · 防御冲击波</b>（左=持盾预备微光，右=格挡瞬间亮弧+涟漪）</div><img src="mockups/r9/t8-guard.png"></div>
+<div class="card"><div class="hd"><b>图2 · 选人月夜背景（默认）</b></div><img src="mockups/r9/t2-select-moon.png"></div>
+<div class="card"><div class="hd"><b>图3 · 难度折扇光标</b></div><img src="mockups/r9/t3-diff-fan.png"></div>
+<div class="card"><div class="hd"><b>图4 · 标题金光闪烁瞬间</b></div><img src="mockups/r9/t1-title-glint.png"></div>
 </div>
-<div class="card"><div class="hd"><b>s5 · ROUND 1 公告（装饰横带默认样式）</b></div><img src="mockups/r7/s5-round.png"></div>
-
-<h2>拍板项 G（R8 更新）— 头身比微调后的成组立绘</h2>
-<div class="sub" style="padding-bottom:6px">你反馈 G4 里「一个脸大一个脸小」→ 已微调：隼人头脸放大、剣二身体加宽（直接在双人图上改会把鬼面具改没，7 次全失败；改成两人分别单独编辑再按眼线拼合，面具零风险）。现在两人眼线同高，脸高差从 ~2.2 倍收敛到 ~1.5 倍（面具天然比素脸大一圈，强行拉平会显假）。</div>
-<div class="card"><div class="hd"><b>G′ · 微调后的一组（拍板：用 / 再调）</b></div><img src="portrait-pair-f1.png"><div class="bd">拍板「用」后我按此比例归一，一次性替换 选人 / VS / 结算 / HUD 四处头像。觉得剣二还是偏大/偏小，直接说方向我再调比例。</div></div>
-<div class="card"><div class="hd">对照 · 原 G4（你上次贴的版本）</div><img src="portrait-pair-c4.png"></div>
-<div class="sub" style="padding:6px 0 14px">连同上轮未回复的：B 防御冲击波(动 fighter.js)准/不准 · C 选人月夜背景用/不用 · D 屏幕过渡做/不做 · E 小提升(难度光标/logo微动/VS斜切)做/不做。例：回复「G用 B准 C用 D做 E全做」。</div>
+<div class="card"><div class="hd"><b>图5 · VS 斜切分割线 + 速度线</b></div><img src="mockups/r9/t4-vs-divider.png"></div>
+<div class="sub">顺手修：连击 HITS 泼墨底下移（原位置会盖住右侧角色名）。</div>
 </section>
 
 <section>
-<h2>一、你的 8 条反馈 — 处理状态</h2>
-<table>
-<tr><th>#</th><th>问题</th><th>状态</th><th>说明</th></tr>
-<tr><td>1</td><td>双语规范（EN 为主 + JP 点缀）</td><td class="done">✅ 已实装</td><td>全局落地：屏幕大标题 = JP 汉字为主 + EN 小字（選べ、己の剣 / 心得 / 一時停止）；人物名 = EN·JP 并排；属性 POW/SPD、操作条、菜单说明全英文</td></tr>
-<tr><td>2</td><td>标题菜单：居中 / VS CPU 太傻 / 副标题 / 署名 / 站桩小人</td><td class="done">✅ 已实装</td><td>菜单改 <b>BATTLE 決闘 / TRAINING 修行 / HOW TO PLAY 心得</b>，EN+JP 光学居中、baseline-middle 垂直居中；副标题已删；<b>LuizMelo 素材为 CC0、署名非必需</b>（已核实 itch.io 页），署名行已删；两个站桩小人已移除，换成飘浮余烬粒子（他们在城门背景上没有地面线，看着像贴上去的）</td></tr>
-<tr><td>3</td><td>选人头像大小不一致 / 名字错位</td><td class="done">✅ 已实装</td><td>两张立绘按视觉脸高重新归一（三轮校准），眼线同高；名字改为「HAYATO · 隼人」单行居中于名牌，副行只留称号</td></tr>
-<tr><td>4</td><td>暂停界面双语混乱</td><td class="done">✅ 已实装</td><td>统一为全局模式：一時停止（大）+ PAUSED（小）竖排，选项改键帽图示</td></tr>
-<tr><td>5</td><td>HUD 血条撞人像框 / 用精致画像</td><td class="done">✅ 已实装</td><td>血条起点让出人像框金角（136/888）；头像改用立绘的方形脸部切片（白面浪人 / 赤鬼面清晰可辨）</td></tr>
-<tr><td>6</td><td>大墨痕丑 / 连击位置</td><td class="pick">🔲 待拍板</td><td>做了 4 种公告风格实机对比（见下节）；连击计数按业界惯例（SF/KOF：出招方一侧固定位，不跟随角色）锚定到血条正下方 y=108，缩小并加泼墨底</td></tr>
-<tr><td>7</td><td>结算屏：台词英语化 / 构图</td><td class="done">✅ 已实装</td><td>台词换日式英语：HAYATO: "The blade... returns to its sheath." / KENJI: "...Too slow."（UI 层翻译表，不动 data.js）；构图随公告风格一起看下节对比</td></tr>
-<tr><td>8</td><td>防御蓝矩形太糙</td><td class="warn">⚠ 需授权</td><td>确认画在 <code>fighter.js</code> 尾部（硬边界文件）。设计已备好：半月弧形气浪（三层弧线：外晕/主弧/内亮边，格挡瞬间弹出扩散涟漪），朝向对手开口。<b>需要动 fighter.js 尾部约 15 行纯视觉代码，与主线冲突风险低——你说「准」我就动</b></td></tr>
-</table>
-
-<div class="grid2">
-<div class="card"><div class="hd"><b>标题屏（新菜单 + 余烬 + 无署名）</b></div><img src="mockups/r6/r01-title.png"></div>
-<div class="card"><div class="hd"><b>选人屏（归一立绘 + EN·JP 名牌 + POW/SPD）</b></div><img src="mockups/r6/r02-select.png"></div>
-<div class="card"><div class="hd"><b>战斗 HUD（立绘头像 + 让位血条 + 家纹）</b></div><img src="mockups/r6/r05-hud.png"></div>
-<div class="card"><div class="hd"><b>暂停（一時停止 / PAUSED + 键帽）</b></div><img src="mockups/r6/r06-pause.png"></div>
-<div class="card"><div class="hd"><b>VS 过场（大立绘对峙，替代小站桩）</b></div><img src="mockups/r6/r04-vs.png"></div>
-<div class="card"><div class="hd"><b>选人屏 · 月夜背景版（拍板项 C）</b></div><img src="mockups/r6/r03-select-moon.png"></div>
-</div>
-</section>
-
-<section>
-<h2>二、公告风格 4 选 1（拍板项 A）— 同一结算屏实机对比</h2>
-<div class="grid2">
-<div class="card"><div class="hd"><b>A1 · 墨痕（现状）</b></div><img src="mockups/r6/r07-result-ink.png"><div class="bd">你已表态不喜欢。保留作对照。</div></div>
-<div class="card"><div class="hd"><b>A2 · 漆金横带（我的推荐）</b></div><img src="mockups/r6/r08-result-band.png"><div class="bd">全宽漆黑带 + 金线 + 朱线，电影字幕感，最干净、和 HUD 语言一致。ROUND/KO 公告同样式（见 r11）。</div></div>
-<div class="card"><div class="hd"><b>A3 · 木牌匾</b></div><img src="mockups/r6/r09-result-plaque.png"><div class="bd">与菜单木牌同族，实体感强，稍重。</div></div>
-<div class="card"><div class="hd"><b>A4 · 细墨痕</b></div><img src="mockups/r6/r10-result-ink2.png"><div class="bd">7:1 细长笔锋版墨痕，比 A1 收敛。</div></div>
-</div>
-<div class="card"><div class="hd"><b>A2 带状风格在 ROUND 1 公告上的效果</b></div><img src="mockups/r6/r11-round-band.png"></div>
-<div class="sub">实机切换：任意页面 URL 加 <code>&ann=band</code> / <code>&ann=plaque</code> / <code>&ann=ink2</code>（默认 ink）。</div>
-</section>
-
-<section>
-<h2>三、Fable 自检清单</h2>
-
-<h3 style="color:#7ec97e">3.1 自检中顺手实装的（无口味争议）</h3>
-<table>
-<tr><td>倒计时最后 10 秒</td><td>屏幕四边红晕脉冲——紧张感反馈，此前只有数字变色</td></tr>
-<tr><td>选人 hover</td><td>立绘微放大 1.04 + 高亮——此前只有亮度差，反馈太弱</td></tr>
-<tr><td>连击计数</td><td>调查结论：SF/KOF 均为「出招方一侧固定位」；已锚定到血条正下，缩小字号加泼墨底</td></tr>
-<tr><td>HOW TO PLAY 标题</td><td>改「心得」大字 + EN 小字，与全局双语模式统一</td></tr>
-</table>
-
-<h3 style="color:#ff9c3d">3.2 平庸点自评（可以做得更好，待你点头排期）</h3>
-<table>
-<tr><th>#</th><th>项</th><th>现状 / 提升方案</th></tr>
-<tr><td>B1</td><td>屏幕切换硬切</td><td>所有屏是瞬间跳转，很廉价。方案：20tick 墨色淡入过渡（ui.js 检测 G.screen 变化叠加渐隐黑幕），零主线依赖。<b>强烈推荐</b></td></tr>
-<tr><td>B2</td><td>难度选择光标</td><td>三块小木牌选中态只有亮度差；补折扇光标与标题菜单一致</td></tr>
-<tr><td>B3</td><td>标题 logo 静态</td><td>只有上下浮动；可加斩痕金粒偶发闪烁（余烬已加，这是锦上添花）</td></tr>
-<tr><td>B4</td><td>结算屏战报单薄</td><td>只有 MAX COMBO 一行；引擎 G.stats 目前只记这一项，扩展需动 main.js（主线协调，挂账）</td></tr>
-<tr><td>B5</td><td>VS 过场静态</td><td>已换大立绘；可再加中央斜切分割线 + 速度线拉出对峙张力（纯 ui.js）</td></tr>
-</table>
-
-<h3 style="color:#e06c5a">3.3 已知边界外欠账（需主线协调，仅记录）</h3>
-<table>
-<tr><td>KO 慢镜/镜头微震</td><td>main.js 回合状态机，本分支不动</td></tr>
-<tr><td>防御音效 / 菜单音效细分</td><td>audio.js 禁区</td></tr>
-<tr><td>战报数据扩展</td><td>见 B4</td></tr>
-</table>
-</section>
-
-<section>
-<h2>四、拍板清单（回复编号即可）</h2>
-<table>
-<tr><th>项</th><th>问题</th><th>选项</th><th>我的推荐</th></tr>
-<tr><td><span class="num">A</span></td><td>公告风格</td><td>A1 墨痕 / A2 漆金横带 / A3 木牌 / A4 细墨痕</td><td><b>A2</b></td></tr>
-<tr><td><span class="num">B</span></td><td>防御冲击波（动 fighter.js 15 行）</td><td>准 / 不准</td><td><b>准</b></td></tr>
-<tr><td><span class="num">C</span></td><td>选人屏月夜背景</td><td>用 / 维持暗化黄昏</td><td><b>用</b>（与战斗黄昏形成节奏差）</td></tr>
-<tr><td><span class="num">D</span></td><td>屏幕过渡淡入（B1）</td><td>做 / 不做</td><td><b>做</b></td></tr>
-<tr><td><span class="num">E</span></td><td>B2/B3/B5 小提升</td><td>全做 / 挑着做 / 不做</td><td><b>全做</b>（都是纯 ui.js 小改）</td></tr>
-<tr><td><span class="num">F</span></td><td>BATTLE·決闘 命名</td><td>OK / 换（备选：出陣 / 対戦）</td><td><b>OK</b></td></tr>
-</table>
-<div class="sub" style="padding:8px 0 30px">例：回复「A2 B准 C用 D做 E全做 F OK」，我直接开工并全部实装。</div>
+<h2>三、回复格式</h2>
+<div class="sub" style="padding:2px 0 30px">回复「G1」/「G3」/「G2」或「再调 + 方向」即可。选定后立绘四处接入 + 全屏回归截图我直接完成。</div>
 </section>
 </body>
 </html>

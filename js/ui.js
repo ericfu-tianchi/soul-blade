@@ -187,6 +187,11 @@ const UI = {
   // ---- fight HUD -----------------------------------------------------------
   drawHUD(ctx, G) {
     const [f1, f2] = G.fighters;
+    // ?guarddemo=1 (debug): pin P1 into primed guard and P2 into blockstun so
+    // the guard crescents can be screenshot at any ?ff=&freeze= frame
+    if (this.guardDemo && f1 && f2) {
+      f1.state = 'guard'; f2.state = 'block'; f2.blockstun = 8;
+    }
 
     // smooth "recent damage" ghost values
     for (const f of G.fighters) {
@@ -465,7 +470,7 @@ const UI = {
     if (f.comboPop > 0) f.comboPop -= 0.5;
     const scale = 1 + (f.comboPop > 0 ? f.comboPop / 10 * 0.5 : 0);
     ctx.save();
-    ctx.translate(x, 108); // fixed under the attacker's health bar
+    ctx.translate(x, 140); // fixed under the attacker's health bar, clear of the name row
     ctx.scale(scale, scale);
     const SP = this.ua.combofx;
     if (SP) { // vermillion ink splash behind the count
@@ -546,6 +551,24 @@ const UI = {
   },
 
   // ---- announcements --------------------------------------------------------
+  // 屏幕切换墨色淡入 (拍板 D): a veil of sumi ink lifts over ~18 ticks on every
+  // screen change. Applied by the wrappers at the bottom of this file so it
+  // always draws on top; a tick jump (ff fast-forward) suppresses it so
+  // ?ff=&freeze= screenshots stay clean.
+  _fade(ctx, G) {
+    const jumped = this._fadeTick !== undefined && G.tick - this._fadeTick > 2;
+    if (G.screen !== this._fadeScr) {
+      this._fadeEnd = (this._fadeScr === undefined || jumped) ? 0 : G.tick + 18;
+      this._fadeScr = G.screen;
+    }
+    this._fadeTick = G.tick;
+    const left = (this._fadeEnd || 0) - G.tick;
+    if (left > 0 && left <= 18) {
+      ctx.fillStyle = `rgba(6,4,3,${((left / 18) * 0.95).toFixed(3)})`;
+      ctx.fillRect(0, 0, 1024, 576);
+    }
+  },
+
   drawAnnounce(ctx, G) {
     const a = G.ann;
     if (!a) return;
@@ -706,6 +729,19 @@ const UI = {
         this._logoKanji(ctx, KANJI[i], x0 + W * fx, L.y0 + H * fy + dy, sz, rot,
           L.outline ? 'gold' : 'ink');
       });
+      // occasional gold glint sweeping the logo (拍板 E · B3): a 4-point star
+      // sparkles somewhere on the emblem every ~1.5s
+      const gcyc = Math.floor(G.tick / 90), gt = G.tick % 90;
+      if (gt < 26) {
+        const r1 = Math.abs(Math.sin(gcyc * 127.1)) % 1, r2 = Math.abs(Math.sin(gcyc * 311.7)) % 1;
+        const gx = x0 + W * (0.2 + 0.6 * r1), gy = L.y0 + H * (0.18 + 0.5 * r2);
+        const p = Math.sin((gt / 26) * Math.PI), s = p * 9;
+        ctx.globalAlpha = p * 0.9;
+        ctx.fillStyle = '#ffe27a';
+        ctx.fillRect(gx - s, gy - 1, s * 2, 2);
+        ctx.fillRect(gx - 1, gy - s, 2, s * 2);
+        ctx.globalAlpha = 1;
+      }
       const subY = Math.min(L.y0 + H + 26, 350);
       this.pixText(ctx, 'SOUL BLADE', 512, subY, { size: 18, align: 'center', color: '#d9a441', outline: true, spacing: 8 });
     } else {
@@ -862,6 +898,19 @@ const UI = {
       ctx.fillStyle = '#8a6a2f';
       ctx.fillRect(0, 150, 1024, 2);
       ctx.fillRect(0, 428, 1024, 2);
+      // diagonal slash divider + speed lines pull the standoff tension (拍板 E · B5)
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, t / 12) * 0.6;
+      ctx.fillStyle = '#8a6a2f';
+      for (let i = 0; i < 8; i++) {
+        const lw = 110 + ((i * 47) % 130), ly = 172 + i * 32;
+        ctx.fillRect(i % 2 ? 1024 - lw : 0, ly, lw, 2);
+      }
+      ctx.globalAlpha = Math.min(1, t / 12);
+      ctx.translate(512, 289); ctx.rotate(-0.30);
+      ctx.fillStyle = '#8a6a2f'; ctx.fillRect(-4, -168, 8, 336);
+      ctx.fillStyle = '#d9a441'; ctx.fillRect(-1, -168, 2, 336);
+      ctx.restore();
       // matched busts instead of tiny floor-less idle sprites
       this.drawBust(ctx, s.p1, 118 - off, 158, 264, 232, false, 1);
       this.drawBust(ctx, s.p2, 642 + off, 158, 264, 232, false, 1);
@@ -954,6 +1003,12 @@ const UI = {
         this.pixText(ctx, `${dd.label} ${dd.en}`, bx + 80, 516, {
           size: 13, align: 'center', color: sel ? '#ffe27a' : (this.ua.panel ? '#b3a68d' : '#9aa3bd'),
         });
+        // small folding-fan cursor inside the picked board's left edge, echoing
+        // the title menu (拍板 E · B2); flanking fans don't fit the 20px board gap
+        if (sel && this.ua.cursor && G.tick % 30 < 22) {
+          const FAN = this.ua.cursor, fw = 26, fh = fw * FAN.h / FAN.w;
+          ctx.drawImage(FAN.cv, bx + 8, 510 - fh / 2, fw, fh);
+        }
       });
       const dd = AI_DIFFS[keys[s.diffCursor]];
       this.pixText(ctx, dd.desc + '   (A/D SELECT · J FIGHT · K BACK)', 512, 552, { size: 12, align: 'center', color: '#9a8f78' });
@@ -1070,8 +1125,9 @@ const UI = {
     // ?ann=ink|plaque|ink2 keeps the alternatives switchable
     this.ann = ['ink', 'plaque', 'ink2'].includes(q.get('ann')) ? q.get('ann') : 'band';
     if (this.ann === 'ink2') jobs.announce = () => this._procSimple('announce-brush-slim.png').then(t => this._inkCentroid(t));
-    // select-screen dedicated background preview (?selbg=moon)
-    this.selbg = q.get('selbg') === 'moon';
+    this.guardDemo = q.has('guarddemo'); // debug: freeze-frame the guard crescents
+    // select screen uses the moonlit courtyard by default (拍板 C); ?selbg=dusk reverts
+    this.selbg = q.get('selbg') !== 'dusk';
     if (this.selbg) jobs.selmoon = () => this._procTitleBg('titlebg-moon.png', 40);
 
     for (const [k, fn] of Object.entries(jobs)) {
@@ -1418,3 +1474,11 @@ const UI = {
     tile(mI, mI, sw - 2 * mI, sh - 2 * mI, x + iw, y + iw, w - 2 * iw, h - 2 * iw);
   },
 };
+
+// per-screen entry points wrapped so the ink-fade veil (UI._fade) always
+// draws last — main.js dispatch stays untouched. drawAnnounce is the last
+// unconditional UI call of the fight frame.
+for (const fn of ['drawTitle', 'drawControls', 'drawSelect', 'drawResult', 'drawAnnounce']) {
+  const orig = UI[fn];
+  UI[fn] = function (...args) { orig.apply(this, args); this._fade(args[0], args[1]); };
+}
