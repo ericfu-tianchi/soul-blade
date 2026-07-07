@@ -209,14 +209,25 @@ const UI = {
     // portraits: gold-corner lacquer frame asset (tassel mirrored to the
     // outside); face art = square crops of the select busts, sprite-crop fallback
     const P = this.ua.portrait;
+    // face crop framing set by Eric in the layout editor (88-unit space)
+    const HUD_CROP = { mack: { x: -2.7, y: -12.3, w: 110.3 }, kenji: { x: 7, y: -5.7, w: 99.3 } };
     for (const [f, px, mir] of [[f1, 12, true], [f2, 924, false]]) {
       const shakeX = f.flash > 0 ? (Math.random() * 4 - 2) : 0;
       const face = (f.c.id === 'kenji' ? this.ua.hudkenji : this.ua.hudmack) || this.portraits[f.c.id];
+      const selArt = f.c.id === 'kenji' ? this.ua.selkenji : this.ua.selmack;
+      const HC = HUD_CROP[f.c.id];
       if (P) {
         const s = 86 / P.inner.w;
-        ctx.fillStyle = f.c.theme;
+        ctx.fillStyle = '#141110';
         ctx.fillRect(px + shakeX, 10, 88, 88);
-        ctx.drawImage(face, px + 2 + shakeX, 12, 84, 84);
+        if (selArt) {
+          ctx.save();
+          ctx.beginPath(); ctx.rect(px + 2 + shakeX, 12, 84, 84); ctx.clip();
+          ctx.drawImage(selArt, px + shakeX + HC.x, 10 + HC.y, HC.w, HC.w * 344 / 320);
+          ctx.restore();
+        } else {
+          ctx.drawImage(face, px + 2 + shakeX, 12, 84, 84);
+        }
         ctx.save();
         if (mir) {
           const cm = px + 44 + shakeX;
@@ -955,25 +966,46 @@ const UI = {
           fill: hovered ? 'rgba(22,26,40,0.95)' : 'rgba(16,19,28,0.92)',
         });
       }
-      // matched bust portrait (head+shoulders) in the upper panel
-      this.drawBust(ctx, cid, x + 8, 122, 304, 202, !(hovered || chosen), hovered ? 1.04 : 1);
-      // theme divider + nameplate under the art
-      ctx.fillStyle = c.theme;
-      ctx.globalAlpha = hovered || chosen ? 1 : 0.5;
-      ctx.fillRect(x + 16, 322, 288, 2);
-      ctx.globalAlpha = 1;
-      // nameplate block: name centered in the plate's CLEAR area (the knot
-      // ornament occupies its left ~38px), TYPE fully below the plate, bars
-      // last — nothing overlaps (was: text on knot, TYPE across plate bottom)
+      // bust exactly where Eric placed it in the layout editor (R12): the art
+      // pops over the panel frame; nameplate strip is drawn ON TOP of the
+      // chest afterwards, so name/type sit on the plate's dark backing
+      const B = { mack: { x: 188, y: 89, w: 300 }, kenji: { x: 609, y: 111, w: 262 } }[cid];
+      const art = cid === 'kenji' ? this.ua.selkenji : this.ua.selmack;
+      if (art) {
+        ctx.save();
+        if (!(hovered || chosen)) ctx.filter = 'brightness(0.72) saturate(0.9)';
+        const z = hovered ? 1.03 : 1, bw = B.w * z, bh = bw * 344 / 320;
+        ctx.drawImage(art, B.x - (bw - B.w) / 2, B.y - (bh - B.w * 344 / 320) / 2, bw, bh);
+        ctx.restore();
+      } else {
+        this.drawCharPreview(ctx, cid, x + 160, 344, 2.25, 0, 'idle', cid === 'mack');
+      }
+      // nameplate near the panel foot: name + TYPE both inside the plate's
+      // clear area (knot ornament owns its left ~38px), POW/SPD below the panel
+      // POW/SPD inside the frame on a slim lacquer strip above the plate
+      ctx.fillStyle = 'rgba(10,7,6,0.72)';
+      ctx.fillRect(x + 16, 352, 288, 22);
+      ctx.fillStyle = 'rgba(217,164,65,0.45)';
+      ctx.fillRect(x + 16, 352, 288, 1);
+      ctx.fillRect(x + 16, 373, 288, 1);
+      const mini = (mx, label, val) => {
+        this.pixText(ctx, label, mx, 368, { size: 9, color: '#9a8f78', spacing: 1 });
+        for (let i = 0; i < 5; i++) {
+          ctx.fillStyle = i < val ? c.theme : 'rgba(37,43,61,0.9)';
+          ctx.fillRect(mx + 34 + i * 16, 357, 12, 8);
+        }
+      };
+      mini(x + 30, 'POW', c.stats.pow);
+      mini(x + 168, 'SPD', c.stats.spd);
       const NP = this.ua.nameplate;
       const plateW = 220, plateH = NP ? plateW * NP.h / NP.w : 60;
-      if (NP) ctx.drawImage(NP.cv, x + 50, 326, plateW, plateH);
-      this.pixText(ctx, `${c.name} · ${c.cn}`, x + 179, 326 + plateH / 2 + 5, { size: 15, align: 'center', color: hovered || chosen ? c.theme : '#c9bfa8', outline: true, maxW: 168 });
-      this.pixText(ctx, `${c.type} TYPE`, x + 160, Math.round(334 + plateH) + 8, { size: 10, align: 'center', color: '#9a8f78', spacing: 2 });
-      this.statBar(ctx, x + 66, 418, 'POW', c.stats.pow, c.theme);
-      this.statBar(ctx, x + 66, 436, 'SPD', c.stats.spd, c.theme);
+      const plateY = 376, plateCy = plateY + plateH / 2;
+      if (NP) ctx.drawImage(NP.cv, x + 50, plateY, plateW, plateH);
+      // name + TYPE centered in the plate's clear span (knot left, tip right)
+      this.pixText(ctx, `${c.name} · ${c.cn}`, x + 170, plateCy - 2, { size: 15, align: 'center', color: hovered || chosen ? c.theme : '#c9bfa8', outline: true, maxW: 148 });
+      this.pixText(ctx, `${c.type} TYPE`, x + 170, plateCy + 16, { size: 9, align: 'center', color: '#9a8f78', spacing: 2, maxW: 140 });
       if (hovered && G.tick % 30 < 20) {
-        this.pixText(ctx, '▼', x + 160, 112, { size: 16, align: 'center', color: '#ffc531' });
+        this.pixText(ctx, '▼', x + 160, 80, { size: 16, align: 'center', color: '#ffc531' });
       }
       if (chosen && s.phase !== 'char') {
         this.pixText(ctx, '1P', x + 18, 146, { size: 14, color: '#ffe27a', outline: true });
@@ -1025,14 +1057,19 @@ const UI = {
     const winner = r.winner;
     const playerWon = winner === G.fighters[0];
 
-    this.drawBust(ctx, winner.c.id, 384, 246, 256, 190, false);
+    // winner bust per the layout editor (Eric placed hayato; kenji derived by
+    // matching the displayed eye-line and face center: same anchors, own scale)
+    const RW = { mack: { x: 392, y: 199, w: 266 }, kenji: { x: 409, y: 212, w: 232 } }[winner.c.id];
+    const wart = winner.c.id === 'kenji' ? this.ua.selkenji : this.ua.selmack;
+    if (wart) ctx.drawImage(wart, RW.x, RW.y, RW.w, RW.w * 344 / 320);
+    else this.drawBust(ctx, winner.c.id, 384, 246, 256, 190, false);
 
     const RB = this.ua.announce;
     if (RB) this.annBack(ctx, 512, 114, 640, 46); // band center 114
     this.pixText(ctx, playerWon ? 'VICTORY' : 'DEFEAT', 512, 133, { // 114 + 0.42em
       size: 46, align: 'center', color: playerWon ? '#ffc531' : '#f4ead6', outline: true, shadow: 6, spacing: 6,
     });
-    this.pixText(ctx, playerWon ? '勝利' : '敗北', 512, RB ? 205 : 172, { size: 22, align: 'center', color: '#f4f1e8', outline: true });
+    this.pixText(ctx, playerWon ? '勝利' : '敗北', 512, RB ? 176 : 172, { size: 22, align: 'center', color: '#f4f1e8', outline: true });
 
     // victory quotes in Japanese-flavored English (UI-layer table; data.js untouched)
     const QUOTES_EN = {
@@ -1048,7 +1085,7 @@ const UI = {
       size: 13, align: 'center', color: '#dfe4f2', maxW: qw - 44,
     });
 
-    this.pixText(ctx, `MAX COMBO: ${G.stats.maxCombo} ${G.stats.maxCombo === 1 ? 'HIT' : 'HITS'}`, 512, RB ? 236 : 218, { size: 13, align: 'center', color: '#9aa3bd' });
+    this.pixText(ctx, `MAX COMBO: ${G.stats.maxCombo} ${G.stats.maxCombo === 1 ? 'HIT' : 'HITS'}`, 512, RB ? 204 : 218, { size: 13, align: 'center', color: '#9aa3bd' });
 
     this.pixText(ctx, 'J REMATCH · K CHARACTER · ESC TITLE', 512, 530, {
       size: 14, align: 'center', color: G.tick % 40 < 25 ? '#ffe27a' : '#8892ad',

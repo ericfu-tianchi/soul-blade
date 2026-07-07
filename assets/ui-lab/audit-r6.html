@@ -28,8 +28,8 @@
 </head>
 <body>
 <header>
-  <h1>刀魂 · UI 审阅页（R11）</h1>
-  <div class="sub">待你两件事：① 防御特效 3 案拍板（下面是实时动画，反复循环「挥砍→格挡→反馈」）；② 用布局编辑器拖出你要的位置。其余 7 项修复已实装。</div>
+  <h1>刀魂 · UI 审阅页（R12）</h1>
+  <div class="sub">你的拖拽布局已全部接入游戏（见第二节实机截图）。唯一待拍板：防御特效 3 案。</div>
 </header>
 
 <section>
@@ -43,7 +43,23 @@
 </section>
 
 <section>
-<h2>二、布局编辑器（你来拖，我来装）</h2>
+<h2>二、你的布局 · 已接入实机</h2>
+<table>
+<tr><th>屏</th><th>接入内容</th></tr>
+<tr><td>选人屏</td><td class="done">✅ 立绘按你的坐标（隼人 188,89,w300 / 剣二 609,111,w262），艺术图越框「破格」式构图；文字重排：POW/SPD 收进框内漆条、名字+TYPE 居中于名牌净区，互不碰撞</td></tr>
+<tr><td>HUD 头像框</td><td class="done">✅ 按你调的切片框（帽檐/鬼角完整、留白一致）</td></tr>
+<tr><td>结算屏</td><td class="done">✅ 隼人按你的坐标（392,199,w266）；剣二按同眼线同脸心推得（409,212,w232）；勝利/MAX COMBO 上移避开帽顶</td></tr>
+</table>
+<div class="grid2">
+<div class="card"><div class="hd"><b>选人屏（你的布局 + 文字重排）</b></div><img src="mockups/r12/s1-select.png"></div>
+<div class="card"><div class="hd"><b>HUD（你的头像切片）</b></div><img src="mockups/r12/s3-hud.png"></div>
+</div>
+<div class="card"><div class="hd"><b>结算屏（你的胜者位）</b></div><img src="mockups/r12/s2-result.png"></div>
+<div class="sub">还想再调：打开 <a href="layout-editor.html" target="_blank">layout-editor.html</a>（已同步为当前实机值）拖完告诉我即可。</div>
+</section>
+
+<section style="display:none">
+<h2>（存档）布局编辑器说明</h2>
 <div class="card"><div class="bd">
 打开 <a href="layout-editor.html" target="_blank"><b>layout-editor.html</b></a> —— 三个标签页：<b>选人屏 / 结算屏 / HUD 头像框</b>。<br>
 · 拖动 = 移动 · 滚轮 = 缩放（文字改字号） · 方向键 = 1px 微调 · 右上角实时显示坐标<br>

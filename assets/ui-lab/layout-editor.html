@@ -50,24 +50,24 @@ const SCREENS = {
     ents: [
       { id: 'panelL',  label: '左面板框', type: 'box',  x: 152, y: 116, w: 320, h: 330 },
       { id: 'panelR',  label: '右面板框', type: 'box',  x: 552, y: 116, w: 320, h: 330 },
-      { id: 'bustHayato', label: '隼人立绘', type: 'img', src: 'portrait-hayato-sel.png', x: 160, y: 122, w: 304, ar: 344/320 },
-      { id: 'bustKenji',  label: '剣二立绘', type: 'img', src: 'portrait-kenji-sel.png',  x: 560, y: 122, w: 304, ar: 344/320 },
-      { id: 'plateL', label: '左名牌', type: 'img', src: 'nameplate.png', x: 202, y: 326, w: 220, ar: 0.30 },
-      { id: 'plateR', label: '右名牌', type: 'img', src: 'nameplate.png', x: 602, y: 326, w: 220, ar: 0.30 },
-      { id: 'nameL', label: '左名字', type: 'text', text: 'HAYATO · 隼人', x: 240, y: 348, fs: 15, color: '#e8543f' },
-      { id: 'nameR', label: '右名字', type: 'text', text: 'KENJI · 剣二',  x: 648, y: 348, fs: 15, color: '#8f7ff0' },
-      { id: 'typeL', label: '左TYPE', type: 'text', text: 'POWER TYPE', x: 258, y: 398, fs: 10, color: '#9a8f78' },
-      { id: 'typeR', label: '右TYPE', type: 'text', text: 'SPEED TYPE', x: 660, y: 398, fs: 10, color: '#9a8f78' },
-      { id: 'statL', label: '左数值', type: 'text', text: 'POW ▮▮▮▮▮▯\nSPD ▮▮▮▯▯▯', x: 218, y: 414, fs: 12, color: '#e8543f' },
-      { id: 'statR', label: '右数值', type: 'text', text: 'POW ▮▮▮▯▯▯\nSPD ▮▮▮▮▮▯', x: 618, y: 414, fs: 12, color: '#8f7ff0' },
+      { id: 'bustHayato', label: '隼人立绘', type: 'img', src: 'portrait-hayato-sel.png', x: 188, y: 89, w: 300, ar: 344/320 },
+      { id: 'bustKenji',  label: '剣二立绘', type: 'img', src: 'portrait-kenji-sel.png',  x: 609, y: 111, w: 262, ar: 344/320 },
+      { id: 'plateL', label: '左名牌', type: 'img', src: 'nameplate.png', x: 202, y: 376, w: 220, ar: 0.30 },
+      { id: 'plateR', label: '右名牌', type: 'img', src: 'nameplate.png', x: 602, y: 376, w: 220, ar: 0.30 },
+      { id: 'nameL', label: '左名字', type: 'text', text: 'HAYATO · 隼人', x: 250, y: 392, fs: 15, color: '#e8543f' },
+      { id: 'nameR', label: '右名字', type: 'text', text: 'KENJI · 剣二',  x: 658, y: 392, fs: 15, color: '#8f7ff0' },
+      { id: 'typeL', label: '左TYPE', type: 'text', text: 'POWER TYPE', x: 272, y: 414, fs: 10, color: '#9a8f78' },
+      { id: 'typeR', label: '右TYPE', type: 'text', text: 'SPEED TYPE', x: 672, y: 414, fs: 10, color: '#9a8f78' },
+      { id: 'statL', label: '左数值', type: 'text', text: 'POW ▮▮▮▮▮▯  SPD ▮▮▮▯▯▯', x: 156, y: 450, fs: 12, color: '#e8543f' },
+      { id: 'statR', label: '右数值', type: 'text', text: 'POW ▮▮▮▯▯▯  SPD ▮▮▮▮▮▯', x: 556, y: 450, fs: 12, color: '#8f7ff0' },
     ],
   },
   result: {
     bg: 'mockups/r10/s4-result.png',
     ents: [
-      { id: 'bustWinner', label: '胜者立绘', type: 'img', src: 'portrait-hayato-sel.png', x: 384, y: 246, w: 256, ar: 344/320 },
-      { id: 'katsu', label: '勝利', type: 'text', text: '勝利', x: 486, y: 186, fs: 22, color: '#f4f1e8' },
-      { id: 'maxcombo', label: 'MAX COMBO', type: 'text', text: 'MAX COMBO: 5 HITS', x: 400, y: 220, fs: 13, color: '#9aa3bd' },
+      { id: 'bustWinner', label: '胜者立绘', type: 'img', src: 'portrait-hayato-sel.png', x: 392, y: 199, w: 266, ar: 344/320 },
+      { id: 'katsu', label: '勝利', type: 'text', text: '勝利', x: 486, y: 158, fs: 22, color: '#f4f1e8' },
+      { id: 'maxcombo', label: 'MAX COMBO', type: 'text', text: 'MAX COMBO: 5 HITS', x: 400, y: 192, fs: 13, color: '#9aa3bd' },
       { id: 'quoteBox', label: '台词框', type: 'box', x: 232, y: 428, w: 560, h: 62 },
     ],
   },
@@ -110,7 +110,7 @@ function buildHud() {
   // two 88x88 frames shown at 3x so the crop is draggable precisely
   const cfg = [['hudHayato', 'portrait-hayato-sel.png', 60, 130], ['hudKenji', 'portrait-kenji-sel.png', 620, 130]];
   for (const [id, src, fx, fy] of cfg) {
-    const s = Object.assign({ w: 264, x: -12, y: -18 }, st(id)); // img width & offset in 3x display space (frame=264)
+    const s = Object.assign(id === 'hudHayato' ? { w: 331, x: -8, y: -37 } : { w: 298, x: 21, y: -17 }, st(id)); // img width & offset in 3x display space (frame=264)
     const fr = document.createElement('div');
     fr.className = 'hudframe'; fr.style.cssText = `left:${fx}px; top:${fy}px; width:264px; height:264px;`;
     const inner = document.createElement('div');
