@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
 <meta charset="utf-8">
-<title>刀魂 · UI 审阅页 — R9</title>
+<title>刀魂 · UI 审阅页 — R10</title>
 <style>
   body { margin:0; background:#14100d; color:#efe6d5; font:14px/1.75 "PingFang SC", monospace; }
   header { padding:22px 30px 10px; border-bottom:2px solid #3a2d1c; }
@@ -13,10 +13,8 @@
   .card { background:#1b1512; border:2px solid #3a2d1c; margin:14px 0; }
   .card .hd { padding:8px 16px; border-bottom:1px solid #3a2d1c; }
   .card .hd b { color:#ffe27a; font-size:15px; }
-  .card .bd { padding:10px 16px 14px; color:#c9bfa8; font-size:13px; }
   .card img { max-width:100%; display:block; background:#000; }
   .done { color:#7ec97e; font-weight:bold; }
-  .pick { color:#ff9c3d; font-weight:bold; }
   .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   table { border-collapse:collapse; width:100%; font-size:13px; }
   td, th { border:1px solid #3a2d1c; padding:6px 10px; text-align:left; vertical-align:top; }
@@ -26,42 +24,30 @@
 </head>
 <body>
 <header>
-  <h1>刀魂 · UI 审阅页（R9）</h1>
-  <div class="sub">本轮拍板的 B/C/D/E 已全部实装（截图为真实运行画面）；唯一待你拍板的是成组立绘 3 选 1。历史轮次内容已清理。</div>
+  <h1>刀魂 · UI 审阅页（R10）</h1>
+  <div class="sub">G1 成组立绘已接入全部四处。<b>没有待拍板项了</b>——可以整体验收。截图为真实运行画面。</div>
 </header>
 
 <section>
-<h2>一、待拍板：成组立绘 3 选 1（生图模型原生重画）</h2>
-<div class="sub" style="padding-bottom:6px">按你的指示改为整组重新生成：把两人画进同一张图、用同一身体模板出图（同 zoom / 同眼线 / 同头身比），不再做缩放拼接。形象特点全部保留。我推荐 <b>G1</b>。选定后我拆分归一，一次性替换 选人 / VS / 结算 / HUD 四处头像。</div>
-<div class="grid2">
-<div class="card"><div class="hd"><b>G1</b>（<span class="pick">推荐</span>）两人头身比最一致，细节最干净</div><img src="portrait-pair-g1.png"></div>
-<div class="card"><div class="hd"><b>G3</b> 同样合格，隼人脸略小于 G1</div><img src="portrait-pair-g3.png"></div>
-</div>
-<div class="card"><div class="hd"><b>G2</b> 备选：比例也一致，但剣二被画上了头巾罩（原设定是露出黑色束发）</div><img src="portrait-pair-g2.png"></div>
-</section>
-
-<section>
-<h2>二、B/C/D/E 已实装 — 验证截图</h2>
+<h2>G1 立绘 · 四处接入完成</h2>
 <table>
-<tr><th>项</th><th>内容</th><th>状态</th></tr>
-<tr><td>B</td><td>防御冲击波：蓝色矩形 → 半月弧形气浪（外晕/主弧/内亮边三层，朝对手鼓出；格挡瞬间外扩涟漪，持盾预备态为微光呼吸）。fighter.js 尾部纯视觉 ~20 行</td><td class="done">✅ 图1</td></tr>
-<tr><td>C</td><td>选人屏月夜专属背景设为默认（<code>?selbg=dusk</code> 可切回黄昏）</td><td class="done">✅ 图2</td></tr>
-<tr><td>D</td><td>屏幕切换墨色淡入（18 tick 墨幕揭起；截图管线的 ff 快进会自动跳过，故无法截到，进游戏切屏即见）</td><td class="done">✅ 实机看</td></tr>
-<tr><td>E</td><td>难度选择折扇光标（图3）· 标题 logo 偶发金光闪烁（图4，魂字右上）· VS 过场斜切分割线+速度线（图5）</td><td class="done">✅</td></tr>
+<tr><th>位置</th><th>处理</th><th>状态</th></tr>
+<tr><td>选人屏</td><td>两人同尺度归一（0.85 / 0.84 近等比，保留 G1 原生比例），眼线同高、占比一致</td><td class="done">✅ 图1</td></tr>
+<tr><td>VS 过场</td><td>同一套立绘自动生效</td><td class="done">✅ 图2</td></tr>
+<tr><td>战斗 HUD</td><td>新脸部切片，两框脸部占比一致、帽檐/鬼角完整</td><td class="done">✅ 图3</td></tr>
+<tr><td>结算屏</td><td>胜者立绘同源更新</td><td class="done">✅ 图4</td></tr>
 </table>
 <div class="grid2">
-<div class="card"><div class="hd"><b>图1 · 防御冲击波</b>（左=持盾预备微光，右=格挡瞬间亮弧+涟漪）</div><img src="mockups/r9/t8-guard.png"></div>
-<div class="card"><div class="hd"><b>图2 · 选人月夜背景（默认）</b></div><img src="mockups/r9/t2-select-moon.png"></div>
-<div class="card"><div class="hd"><b>图3 · 难度折扇光标</b></div><img src="mockups/r9/t3-diff-fan.png"></div>
-<div class="card"><div class="hd"><b>图4 · 标题金光闪烁瞬间</b></div><img src="mockups/r9/t1-title-glint.png"></div>
+<div class="card"><div class="hd"><b>图1 · 选人屏</b></div><img src="mockups/r10/s1-select.png"></div>
+<div class="card"><div class="hd"><b>图2 · VS 过场</b></div><img src="mockups/r10/s2-vs.png"></div>
+<div class="card"><div class="hd"><b>图3 · 战斗 HUD</b></div><img src="mockups/r10/s3-hud.png"></div>
+<div class="card"><div class="hd"><b>图4 · 结算屏</b></div><img src="mockups/r10/s4-result.png"></div>
 </div>
-<div class="card"><div class="hd"><b>图5 · VS 斜切分割线 + 速度线</b></div><img src="mockups/r9/t4-vs-divider.png"></div>
-<div class="sub">顺手修：连击 HITS 泼墨底下移（原位置会盖住右侧角色名）。</div>
 </section>
 
 <section>
-<h2>三、回复格式</h2>
-<div class="sub" style="padding:2px 0 30px">回复「G1」/「G3」/「G2」或「再调 + 方向」即可。选定后立绘四处接入 + 全屏回归截图我直接完成。</div>
+<h2>整体验收提示</h2>
+<div class="sub" style="padding:2px 0 30px">上轮实装的 B 防御弧形气浪（战斗中按住后方向）、C 选人月夜背景、D 切屏墨色淡入（只能实机看）、E 难度折扇/logo 金光/VS 斜切线 都已在线上。从标题页整体走一遍即可：<code>http://localhost:8788/</code></div>
 </section>
 </body>
 </html>
