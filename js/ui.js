@@ -292,10 +292,10 @@ const UI = {
     this.meterBar(ctx, G, f1, 24, false);
     this.meterBar(ctx, G, f2, 700, true);
 
-    // combo counters — fixed on the attacker's side under their bar, per
-    // fighting-game convention (SF/KOF anchor these, they don't follow chars)
-    this.comboCounter(ctx, G, f1, 136, false);
-    this.comboCounter(ctx, G, f2, 888, true);
+    // combo counters — attacker's side, upper-mid screen near the fighters so
+    // they sit in the player's sightline (moved off the bar row per review)
+    this.comboCounter(ctx, G, f1, 240, false);
+    this.comboCounter(ctx, G, f2, 784, true);
 
     // training info bar / key hint bar — auto-sized strips stacked ABOVE the
     // meter labels (y<510) so the bottom rows can never collide or clip
@@ -395,13 +395,19 @@ const UI = {
   },
 
   pip(ctx, x, y, won, theme) {
+    if (!won) {
+      // unwon round = hollow ring (a dimmed crest read as already filled)
+      ctx.fillStyle = 'rgba(10,8,6,0.6)';
+      ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(217,164,65,0.6)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(x, y, 7.5, 0, Math.PI * 2); ctx.stroke();
+      return;
+    }
     const M = this.ua.pipmon;
     if (M) {
       const d = 22, mw = d, mh = d * M.h / M.w;
-      ctx.save();
-      if (!won) ctx.filter = 'brightness(0.34) saturate(0.4)'; // unwon = dimmed crest
       ctx.drawImage(M.cv, x - mw / 2, y - mh / 2, mw, mh);
-      ctx.restore();
       return;
     }
     ctx.save();
@@ -470,7 +476,7 @@ const UI = {
     if (f.comboPop > 0) f.comboPop -= 0.5;
     const scale = 1 + (f.comboPop > 0 ? f.comboPop / 10 * 0.5 : 0);
     ctx.save();
-    ctx.translate(x, 140); // fixed under the attacker's health bar, clear of the name row
+    ctx.translate(x, 185); // upper-mid, just above the fighters' heads
     ctx.scale(scale, scale);
     const SP = this.ua.combofx;
     if (SP) { // vermillion ink splash behind the count
@@ -898,7 +904,8 @@ const UI = {
       ctx.fillStyle = '#8a6a2f';
       ctx.fillRect(0, 150, 1024, 2);
       ctx.fillRect(0, 428, 1024, 2);
-      // diagonal slash divider + speed lines pull the standoff tension (拍板 E · B5)
+      // speed lines pull the standoff tension (the diagonal divider bar was
+      // cut per review — it read as a stray line behind the emblem)
       ctx.save();
       ctx.globalAlpha = Math.min(1, t / 12) * 0.6;
       ctx.fillStyle = '#8a6a2f';
@@ -906,10 +913,6 @@ const UI = {
         const lw = 110 + ((i * 47) % 130), ly = 172 + i * 32;
         ctx.fillRect(i % 2 ? 1024 - lw : 0, ly, lw, 2);
       }
-      ctx.globalAlpha = Math.min(1, t / 12);
-      ctx.translate(512, 289); ctx.rotate(-0.30);
-      ctx.fillStyle = '#8a6a2f'; ctx.fillRect(-4, -168, 8, 336);
-      ctx.fillStyle = '#d9a441'; ctx.fillRect(-1, -168, 2, 336);
       ctx.restore();
       // matched busts instead of tiny floor-less idle sprites
       this.drawBust(ctx, s.p1, 118 - off, 158, 264, 232, false, 1);
@@ -959,13 +962,16 @@ const UI = {
       ctx.globalAlpha = hovered || chosen ? 1 : 0.5;
       ctx.fillRect(x + 16, 322, 288, 2);
       ctx.globalAlpha = 1;
+      // nameplate block: name centered in the plate's CLEAR area (the knot
+      // ornament occupies its left ~38px), TYPE fully below the plate, bars
+      // last — nothing overlaps (was: text on knot, TYPE across plate bottom)
       const NP = this.ua.nameplate;
-      if (NP) ctx.drawImage(NP.cv, x + 44, 328, 232, 232 * NP.h / NP.w);
-      // name = EN + JP only (epithet line dropped per review); attributes EN
-      this.pixText(ctx, `${c.name} · ${c.cn}`, x + 160, 350, { size: 16, align: 'center', color: hovered || chosen ? c.theme : '#c9bfa8', outline: true, maxW: 214 });
-      this.pixText(ctx, `${c.type} TYPE`, x + 160, 382, { size: 10, align: 'center', color: '#9a8f78', spacing: 2 });
-      this.statBar(ctx, x + 66, 400, 'POW', c.stats.pow, c.theme);
-      this.statBar(ctx, x + 66, 420, 'SPD', c.stats.spd, c.theme);
+      const plateW = 220, plateH = NP ? plateW * NP.h / NP.w : 60;
+      if (NP) ctx.drawImage(NP.cv, x + 50, 326, plateW, plateH);
+      this.pixText(ctx, `${c.name} · ${c.cn}`, x + 179, 326 + plateH / 2 + 5, { size: 15, align: 'center', color: hovered || chosen ? c.theme : '#c9bfa8', outline: true, maxW: 168 });
+      this.pixText(ctx, `${c.type} TYPE`, x + 160, Math.round(334 + plateH) + 8, { size: 10, align: 'center', color: '#9a8f78', spacing: 2 });
+      this.statBar(ctx, x + 66, 418, 'POW', c.stats.pow, c.theme);
+      this.statBar(ctx, x + 66, 436, 'SPD', c.stats.spd, c.theme);
       if (hovered && G.tick % 30 < 20) {
         this.pixText(ctx, '▼', x + 160, 112, { size: 16, align: 'center', color: '#ffc531' });
       }
@@ -1003,12 +1009,6 @@ const UI = {
         this.pixText(ctx, `${dd.label} ${dd.en}`, bx + 80, 516, {
           size: 13, align: 'center', color: sel ? '#ffe27a' : (this.ua.panel ? '#b3a68d' : '#9aa3bd'),
         });
-        // small folding-fan cursor inside the picked board's left edge, echoing
-        // the title menu (拍板 E · B2); flanking fans don't fit the 20px board gap
-        if (sel && this.ua.cursor && G.tick % 30 < 22) {
-          const FAN = this.ua.cursor, fw = 26, fh = fw * FAN.h / FAN.w;
-          ctx.drawImage(FAN.cv, bx + 8, 510 - fh / 2, fw, fh);
-        }
       });
       const dd = AI_DIFFS[keys[s.diffCursor]];
       this.pixText(ctx, dd.desc + '   (A/D SELECT · J FIGHT · K BACK)', 512, 552, { size: 12, align: 'center', color: '#9a8f78' });
