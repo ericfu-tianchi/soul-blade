@@ -29,12 +29,12 @@
 <body>
 <header>
   <h1>刀魂 · UI 审阅页（R12）</h1>
-  <div class="sub">你的拖拽布局已全部接入游戏（见第二节实机截图）。唯一待拍板：防御特效 3 案。</div>
+  <div class="sub">防御特效已定稿实装（朱印結界·无字版）；拖拽布局已全部接入。当前无待拍板项。</div>
 </header>
 
 <section>
-<h2>一、待拍板：防御特效 3 案（实时动画演示）</h2>
-<div class="sub" style="padding-bottom:6px">每格动画循环演示：对手刀光袭来 → 格挡瞬间（定帧+震动）→ 后续动态反馈。我推荐 <b>案二·朱印結界</b>（和风符号最强、预备态和格挡态层次分明）。</div>
+<h2>一、防御特效 · 已定稿实装：朱印結界（无字版）</h2>
+<div class="sub" style="padding-bottom:6px">你选了結界并去掉「防」字。最终版已写进 fighter.js：持防 = 旋转朱印环（虚线外环 + 金色反向内环 + 菱形芯，呼吸明暗）；格挡瞬间 = 金光爆亮 + 脉冲环 + 径向碎光 + 花瓣飘散。<b>实机动画观看：<a href="http://localhost:8788/?fight=1&training=1&guarddemo=1" target="_blank">点这里</a></b>（左 = 持防预备态，右 = 每 0.8 秒循环一次格挡爆发）；也可直接开一局按住后方向体验。下面三个低保真示意稿仅留档对照。</div>
 <div class="grid3">
 <div class="card"><div class="hd"><b>案一 · 墨環砕</b>（瞬发型）</div><canvas id="g1" width="480" height="270"></canvas><div class="bd">平时无预备特效，格挡瞬间：白闪楔 + 双层墨环（金边）爆开 + 墨点飞溅 + 击退回弹。最克制、最贴近剑戟片的「一瞬」。</div></div>
 <div class="card"><div class="hd"><b>案二 · 朱印結界</b>（结界型·推荐）</div><canvas id="g2" width="480" height="270"></canvas><div class="bd">持防时身前浮现旋转朱印圆环（中央「防」字，呼吸明暗）；格挡瞬间印环金光爆亮 + 径向碎光 + 花瓣飘散 + 震动。</div></div>

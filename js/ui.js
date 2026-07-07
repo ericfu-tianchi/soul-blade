@@ -187,10 +187,14 @@ const UI = {
   // ---- fight HUD -----------------------------------------------------------
   drawHUD(ctx, G) {
     const [f1, f2] = G.fighters;
-    // ?guarddemo=1 (debug): pin P1 into primed guard and P2 into blockstun so
-    // the guard crescents can be screenshot at any ?ff=&freeze= frame
+    // ?guarddemo=1 (debug): P1 pinned in primed guard; P2 loops the block
+    // impact every 48 ticks — a live showreel of the seal animation
+    // (with &freeze= it stays a single frame for screenshots)
     if (this.guardDemo && f1 && f2) {
-      f1.state = 'guard'; f2.state = 'block'; f2.blockstun = 8;
+      f1.state = 'guard';
+      const c = G.tick % 48;
+      if (c < 15) { f2.state = 'block'; f2.blockstun = 14 - c; }
+      else f2.state = 'guard';
     }
 
     // smooth "recent damage" ghost values
