@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>刀魂 · How to Play 改造 4 方案 (howto-lab)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+@font-face { font-family:'PressStart'; src:url('assets/fonts/PressStart2P.ttf') format('truetype'); }
+@font-face { font-family:'FusionPixel'; src:url('assets/fonts/FusionPixel-zh.woff2') format('woff2'); }
+@font-face { font-family:'FusionPixelJA'; src:url('assets/fonts/FusionPixel-ja.woff2') format('woff2'); }
+:root{
+  --ink:#0b0708; --lac:#171009; --lac2:#211510; --line:#6a4a24; --gold:#d9a441;
+  --gold2:#ffe27a; --cream:#f4ead6; --mut:#9a8f78; --crim:#c93527; --dark:#0d0706;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--cream);font-family:'FusionPixelJA','FusionPixel','Hiragino Sans GB',sans-serif;padding:26px 18px 80px}
+.en{font-family:'PressStart',monospace}
+h1{font-size:20px;color:var(--gold2);letter-spacing:2px;margin-bottom:6px}
+.sub{color:var(--mut);font-size:12px;margin-bottom:18px;line-height:1.8}
+.reco{border:1px solid var(--line);background:var(--lac);padding:12px 16px;font-size:13px;line-height:2;margin-bottom:34px}
+.reco b{color:var(--gold2)}
+section{margin-bottom:56px}
+.vh{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+.vh .tag{font-family:'PressStart',monospace;font-size:14px;color:var(--ink);background:var(--gold);padding:4px 10px}
+.vh .tag.rec{background:var(--crim);color:var(--gold2)}
+.vh h2{font-size:17px;color:var(--cream)}
+.vh .who{color:var(--mut);font-size:12px}
+.notes{font-size:12px;color:var(--mut);line-height:2;margin-top:10px;max-width:1024px}
+.notes b{color:var(--gold)}
+/* ------- 1024x576 mock frame, scaled to fit ------- */
+.fwrap{max-width:1024px}
+.frame{width:1024px;height:576px;position:relative;overflow:hidden;transform-origin:top left;
+  border:2px solid var(--line);background:#120a08}
+.frame .veil{position:absolute;inset:0;background:rgba(7,8,12,.86)}
+.stagebg{position:absolute;inset:0;background:url('assets/ui-lab/stage-alt.png') center 62%/cover;opacity:.5}
+/* in-frame chrome */
+.band{position:absolute;left:0;right:0;top:0;height:56px;background:linear-gradient(#241610,#1a0f0b);
+  border-bottom:2px solid var(--line);display:flex;align-items:center;padding:0 26px;gap:18px}
+.band .t{font-family:'PressStart',monospace;font-size:17px;color:var(--gold2);letter-spacing:3px}
+.band .tj{color:var(--gold);font-size:15px}
+.foot{position:absolute;left:0;right:0;bottom:0;height:34px;display:flex;align-items:center;justify-content:center;
+  font-family:'PressStart',monospace;font-size:9px;color:#5d6784;letter-spacing:1px;background:rgba(10,6,5,.7)}
+.kc{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 7px;
+  background:#14100e;border:2px solid #8a6a2f;border-radius:5px;color:var(--gold2);
+  font-family:'PressStart',monospace;font-size:12px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.55), 0 2px 0 #000}
+.kc.sm{min-width:22px;height:22px;font-size:9px;border-width:1px;border-radius:4px}
+.plus{color:var(--mut);font-family:'PressStart',monospace;font-size:11px;margin:0 3px}
+.arr{color:var(--mut);font-family:'PressStart',monospace;font-size:11px;margin:0 4px}
+/* sprite demo */
+.stage{position:relative;overflow:hidden;background:#1a0e0b;border:2px solid var(--line)}
+.stage::before{content:'';position:absolute;inset:0;background:url('assets/ui-lab/stage-alt.png') center 68%/cover;opacity:.35}
+.stage::after{content:'';position:absolute;left:0;right:0;bottom:0;height:26%;
+  background:linear-gradient(transparent,rgba(0,0,0,.6));}
+.stage .ground{position:absolute;left:0;right:0;bottom:14%;height:2px;background:rgba(217,164,65,.28);z-index:1}
+.sp{position:absolute;width:200px;height:200px;background-repeat:no-repeat;image-rendering:pixelated;z-index:2;
+  animation:play calc(var(--n) * .13s) steps(var(--n)) infinite}
+@keyframes play{from{background-position:0 0}to{background-position:calc(-200px * var(--n)) 0}}
+.cardname{font-family:'PressStart',monospace;font-size:10px;color:var(--gold2);letter-spacing:1px}
+.cardjp{font-size:12px;color:var(--gold)}
+.hint{font-size:11px;color:var(--mut)}
+/* annotation badges */
+.dot{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--crim);color:var(--gold2);
+  display:flex;align-items:center;justify-content:center;font-family:'PressStart',monospace;font-size:11px;
+  z-index:9;box-shadow:0 0 0 2px rgba(255,226,122,.7)}
+/* char tabs */
+.tabs{display:flex;gap:8px}
+.tab{display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border:2px solid var(--line);background:#14100e;color:var(--mut)}
+.tab img{width:34px;height:34px;image-rendering:pixelated;border:1px solid var(--line)}
+.tab.on{border-color:var(--gold);background:#241610;color:var(--gold2);box-shadow:0 0 10px rgba(217,164,65,.25)}
+.tab .nm{font-family:'PressStart',monospace;font-size:10px}
+.tab .jp{font-size:12px}
+/* compare table */
+table{border-collapse:collapse;font-size:13px;max-width:1024px;width:100%;margin-top:8px}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;line-height:1.7}
+th{background:var(--lac2);color:var(--gold2);font-size:12px}
+td b{color:var(--gold2)}
+.verdict{border:2px solid var(--gold);background:#241610;padding:14px 18px;font-size:13px;line-height:2.1;margin-top:22px;max-width:1024px}
+.verdict b{color:var(--gold2)}
+</style>
+</head>
+<body>
+
+<h1>「HOW TO PLAY」改造 — 4 方案示意 <span class="en" style="font-size:11px;color:var(--mut)">howto-lab</span></h1>
+<div class="sub">卡片里的角色动画都是<b style="color:var(--gold)">真素材直接在跑</b>(CSS 逐帧播 sprite sheet)——正式实装会换成真引擎渲染(带刀光/打击特效,数值自动同步)。红点 ●数字 是交互标注,对应每张图下方说明。</div>
+
+<div class="reco">
+  <b>我的判断先放前面:</b>推荐 <b>V2 图鉴式</b> 作为 How to Play 本体(信息最全、纯键盘导航自然、一次只渲染一个演示最省);
+  你的"敌人出招瞬间闪按键提示"这个点子非常好,把它做进 V2 的防御条目演示里(木桩出招的 active 帧闪 <span class="kc sm">←</span>)。
+  <b>V4 道场</b>是它的进阶版(上手教学效果最好,但要做课程脚本,建议二期放进「修行」菜单)。V1 改动最小,V3 最炫但导航与性能一般。
+</div>
+
+<!-- ================= V1 ================= -->
+<section>
+  <div class="vh"><span class="tag">V1</span><h2>混合式 — 文字为主,秘技配动图</h2><span class="who">(你说的方向 1,改动最小)</span></div>
+  <div class="fwrap"><div class="frame" data-scale>
+    <div class="veil"></div>
+    <div class="band"><span class="t">HOW TO PLAY</span><span class="tj">· 心得</span>
+      <div style="margin-left:auto" class="tabs">
+        <div class="tab on"><img src="assets/ui-lab/portrait-hayato-hud.png"><span class="nm">KENJI</span></div>
+        <div class="tab"><img src="assets/ui-lab/portrait-kenji-hud.png"><span class="nm">HAYATO</span></div>
+      </div>
+    </div>
+    <div class="dot" style="top:64px;left:12px">1</div>
+    <!-- left text columns (current style, condensed) -->
+    <div style="position:absolute;top:78px;left:34px;width:400px">
+      <div class="cardname" style="margin-bottom:12px;color:var(--gold)">MOVEMENT · 移動</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;font-size:13px">
+        <span><span class="kc sm">A</span><span class="kc sm">D</span></span><span class="hint">WALK 移動</span>
+        <span><span class="kc sm">W</span></span><span class="hint">JUMP 跳躍</span>
+        <span><span class="kc sm">S</span></span><span class="hint">CROUCH 下蹲</span>
+        <span><span class="kc sm">A</span><span class="kc sm">A</span><span class="plus">/</span><span class="kc sm">D</span><span class="kc sm">D</span></span><span class="hint">DASH 疾走/後撤</span>
+      </div>
+      <div class="cardname" style="margin:20px 0 12px;color:var(--gold)">ATTACK · 攻撃</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;font-size:13px">
+        <span><span class="kc sm">J</span></span><span class="hint">LIGHT 輕斬</span>
+        <span><span class="kc sm">K</span></span><span class="hint">HEAVY 重斬</span>
+        <span><span class="kc sm">U</span></span><span class="hint">SPECIAL 特殊技(冷却)</span>
+        <span><span class="kc sm">I</span></span><span class="hint">SUPER 超必殺(気満)</span>
+      </div>
+      <div class="cardname" style="margin:20px 0 12px;color:var(--gold)">DEFENSE · 防御</div>
+      <div style="font-size:13px" class="hint">按住<b style="color:var(--cream)">远离敌人</b>的方向 = 格挡<br>被打满护条会<b style="color:var(--crim)">破防</b> · 绕背可破解格挡</div>
+    </div>
+    <!-- right: technique cards with live demos -->
+    <div class="dot" style="top:64px;right:452px">2</div>
+    <div style="position:absolute;top:78px;right:30px;width:508px">
+      <div class="cardname" style="margin-bottom:12px;color:var(--gold)">TECHNIQUES · 秘技(看不懂文字?看演示)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div>
+          <div class="stage" style="height:150px"><div class="ground"></div>
+            <div class="sp" data-sheet="assets/img/mack/Crouch.png" style="left:50px;bottom:-12px;transform:scale(1.15)"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+            <span class="cardname">2J RAPID <span class="cardjp">蹲輕·連打</span></span>
+            <span><span class="kc sm">S</span><span class="plus">+</span><span class="kc sm">J</span><span class="kc sm">J</span><span class="kc sm">J</span></span>
+          </div>
+        </div>
+        <div>
+          <div class="stage" style="height:150px"><div class="ground"></div>
+            <div class="sp" data-sheet="assets/img/mack/Attack2.png" style="left:50px;bottom:-12px;transform:scale(1.15)"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+            <span class="cardname">2K LAUNCH <span class="cardjp">蹲重·挑空</span></span>
+            <span><span class="kc sm">S</span><span class="plus">+</span><span class="kc sm">K</span></span>
+          </div>
+        </div>
+        <div>
+          <div class="stage" style="height:150px"><div class="ground"></div>
+            <div class="sp" data-sheet="assets/img/mack/Attack1.png" style="left:14px;bottom:-12px;transform:scale(1.12)"></div>
+            <div class="sp" data-sheet="assets/img/kenji/TakeHit.png" style="right:8px;bottom:-12px;transform:scaleX(-1) scale(1.12)"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+            <span class="cardname">CHAIN <span class="cardjp">連携 J·J·K·K</span></span>
+            <span><span class="kc sm">J</span><span class="kc sm">J</span><span class="kc sm">K</span><span class="kc sm">K</span></span>
+          </div>
+        </div>
+        <div>
+          <div class="stage" style="height:150px"><div class="ground"></div>
+            <div class="sp" data-sheet="assets/img/mack/Attack2.png" style="left:14px;bottom:-12px;transform:scale(1.12);filter:drop-shadow(0 0 8px rgba(201,53,39,.9))"></div>
+            <div class="sp" data-sheet="assets/img/kenji/TakeHit.png" style="right:8px;bottom:-12px;transform:scaleX(-1) scale(1.12)"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+            <span class="cardname">SUPER CANCEL <span class="cardjp">J·J·K·I</span></span>
+            <span><span class="kc sm">J</span><span class="kc sm">J</span><span class="kc sm">K</span><span class="kc sm">I</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot">A/D SWITCH CHARACTER · ESC BACK</div>
+  </div></div>
+  <div class="notes">
+    <b>●1</b> 左半保持现有文字排版(基础键位一眼扫完)。<b>●2</b> 右半 2×2 秘技卡,每张卡一个循环小演示 + 键位。一屏放下、零翻页;角色切换只刷新 4 张卡。
+    <b>局限:</b>只能挑 4 个"最需要演示"的招,连招表放不全。
+  </div>
+</section>
+
+<!-- ================= V2 ================= -->
+<section>
+  <div class="vh"><span class="tag rec">V2 ★推荐</span><h2>图鉴式 — 左列招式表 + 右侧大演示台</h2><span class="who">(动作实验室的教学化)</span></div>
+  <div class="fwrap"><div class="frame" data-scale>
+    <div class="veil"></div>
+    <div class="band"><span class="t">HOW TO PLAY</span><span class="tj">· 心得</span>
+      <div style="margin-left:auto" class="tabs">
+        <div class="tab on"><img src="assets/ui-lab/portrait-hayato-hud.png"><span class="nm">KENJI</span><span class="jp">剣二</span></div>
+        <div class="tab"><img src="assets/ui-lab/portrait-kenji-hud.png"><span class="nm">HAYATO</span><span class="jp">隼人</span></div>
+      </div>
+    </div>
+    <div class="dot" style="top:64px;left:12px">1</div>
+    <!-- left move list -->
+    <div style="position:absolute;top:72px;left:26px;bottom:44px;width:300px;border:2px solid var(--line);background:rgba(20,12,9,.92);padding:12px 0;overflow:hidden">
+      <div style="padding:0 16px" class="cardname">MOVEMENT · 移動</div>
+      <div class="mrow">WALK / JUMP / CROUCH</div>
+      <div class="mrow">DASH 疾走 · 後撤</div>
+      <div style="padding:10px 16px 0" class="cardname">NORMALS · 基本技</div>
+      <div class="mrow">5J 輕斬</div>
+      <div class="mrow">5K 重斬</div>
+      <div class="mrow">2J 蹲輕(連打)</div>
+      <div class="mrow on">▶ 2K 蹲重 · 挑空</div>
+      <div style="padding:10px 16px 0" class="cardname">COMBO · 連携</div>
+      <div class="mrow">J·J 変招</div>
+      <div class="mrow">K·K 疾風二段(倒地)</div>
+      <div class="mrow">J·J·K·K 基本連携</div>
+      <div class="mrow">J·J·K·I 超殺取消</div>
+      <div style="padding:10px 16px 0" class="cardname">SPECIAL · 必殺</div>
+      <div class="mrow">U 特殊技</div>
+      <div class="mrow">I 超必殺 · 満開連獄斬</div>
+      <div style="padding:10px 16px 0" class="cardname">DEFENSE · 防御</div>
+      <div class="mrow">GUARD 方向格挡</div>
+    </div>
+    <div class="dot" style="top:64px;left:348px">2</div>
+    <!-- right demo stage -->
+    <div style="position:absolute;top:72px;left:348px;right:26px;height:330px" class="stage">
+      <div class="ground" style="bottom:12%"></div>
+      <div class="sp" data-sheet="assets/img/mack/Attack2.png" style="left:170px;bottom:22px;transform:scale(1.85);transform-origin:bottom center"></div>
+      <div class="sp" data-sheet="assets/img/kenji/TakeHit.png" style="right:120px;bottom:22px;transform:scaleX(-1) scale(1.85);transform-origin:bottom center"></div>
+      <div style="position:absolute;top:12px;left:16px" class="cardname" >2K · 蹲重斬 <span class="cardjp">LAUNCHER 挑空</span></div>
+      <div style="position:absolute;top:12px;right:16px" class="hint en" style="font-size:9px">AUTO LOOP</div>
+    </div>
+    <div class="dot" style="top:420px;left:348px">3</div>
+    <!-- key sequence + tip -->
+    <div style="position:absolute;top:416px;left:348px;right:26px;bottom:44px;border:2px solid var(--line);background:rgba(20,12,9,.92);padding:14px 20px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="hint">INPUT</span>
+        <span class="kc">S</span><span class="plus">+</span><span class="kc">K</span>
+        <span style="margin-left:26px" class="hint">挑空后可接空中追击 · 不可连锁取消 · 破防好帮手</span>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:26px" class="hint">
+        <span><b style="color:var(--gold2)">DMG</b> 9</span><span><b style="color:var(--gold2)">GUARD DMG</b> 高</span><span><b style="color:var(--gold2)">部位</b> 下段→上段</span>
+      </div>
+    </div>
+    <div class="foot">W/S CHOOSE MOVE · A/D CHARACTER · J REPLAY · ESC BACK</div>
+  </div></div>
+  <div class="notes">
+    <b>●1</b> 左列 = 全部招式分组列表(纯 W/S 上下选,和游戏菜单同一套操作),<b>两个角色各自一份表</b>,A/D 切角色。
+    <b>●2</b> 右侧大演示台:选中哪招演示哪招,真引擎循环回放(带刀光、打击星爆、木桩受击)。防御条目 = 木桩出招瞬间在演示台上闪 <span class="kc sm">←</span> 提示(你的点子)。
+    <b>●3</b> 底部:键位序列 + 一句要点 + 关键数值。<b>优点:</b>全招式覆盖、一次只渲染一个演示、导航直觉;<b>这就是把动作实验室"教学化"。</b>
+  </div>
+</section>
+
+<!-- ================= V3 ================= -->
+<section>
+  <div class="vh"><span class="tag">V3</span><h2>全动图卡片墙 — 所有招式都是动卡,翻页浏览</h2><span class="who">(你说的方向 2)</span></div>
+  <div class="fwrap"><div class="frame" data-scale>
+    <div class="veil"></div>
+    <div class="band"><span class="t">HOW TO PLAY</span><span class="tj">· 心得</span>
+      <div style="margin-left:auto" class="tabs">
+        <div class="tab on"><img src="assets/ui-lab/portrait-hayato-hud.png"><span class="nm">KENJI</span></div>
+        <div class="tab"><img src="assets/ui-lab/portrait-kenji-hud.png"><span class="nm">HAYATO</span></div>
+      </div>
+    </div>
+    <div class="dot" style="top:64px;left:12px">1</div>
+    <!-- movement strip -->
+    <div style="position:absolute;top:70px;left:26px;right:26px;height:56px;border:2px solid var(--line);background:rgba(20,12,9,.92);display:flex;align-items:center;gap:22px;padding:0 20px">
+      <span class="cardname" style="color:var(--gold)">MOVEMENT</span>
+      <span><span class="kc sm">W</span> <span class="hint">跳</span></span>
+      <span><span class="kc sm">A</span><span class="kc sm">S</span><span class="kc sm">D</span> <span class="hint">移動/蹲</span></span>
+      <span><span class="kc sm">A</span><span class="kc sm">A</span><span class="plus">/</span><span class="kc sm">D</span><span class="kc sm">D</span> <span class="hint">疾走·後撤</span></span>
+      <span style="margin-left:auto"><span class="hint">HOLD</span> <span class="kc sm">←</span> <span class="hint">格挡(远离方向)</span></span>
+    </div>
+    <div class="dot" style="top:140px;left:12px">2</div>
+    <!-- card grid -->
+    <div style="position:absolute;top:140px;left:26px;right:26px;bottom:74px;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:12px">
+      <div><div class="stage" style="height:74%"><div class="ground"></div><div class="sp" data-sheet="assets/img/mack/Attack1.png" style="left:36px;bottom:-24px;transform:scale(.95)"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px"><span class="cardname">5J 輕斬</span><span><span class="kc sm">J</span></span></div></div>
+      <div><div class="stage" style="height:74%"><div class="ground"></div><div class="sp" data-sheet="assets/img/mack/Attack2.png" style="left:36px;bottom:-24px;transform:scale(.95)"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px"><span class="cardname">5K 重斬</span><span><span class="kc sm">K</span></span></div></div>
+      <div><div class="stage" style="height:74%"><div class="ground"></div><div class="sp" data-sheet="assets/img/mack/Crouch.png" style="left:36px;bottom:-24px;transform:scale(.95)"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px"><span class="cardname">2J 蹲輕</span><span><span class="kc sm">S</span><span class="plus">+</span><span class="kc sm">J</span></span></div></div>
+      <div><div class="stage" style="height:74%"><div class="ground"></div><div class="sp" data-sheet="assets/img/mack/Attack2.png" style="left:36px;bottom:-24px;transform:scale(.95)"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px"><span class="cardname">2K 挑空</span><span><span class="kc sm">S</span><span class="plus">+</span><span class="kc sm">K</span></span></div></div>
+      <div><div class="stage" style="height:74%"><div class="ground"></div>
+          <div class="sp" data-sheet="assets/img/mack/Attack1.png" style="left:6px;bottom:-24px;transform:scale(.9)"></div>
+          <div class="sp" data-sheet="assets/img/kenji/TakeHit.png" style="right:2px;bottom:-24px;transform:scaleX(-1) scale(.9)"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px"><span class="cardname">J·J·K·K</span><span><span class="kc sm">J</span><span class="kc sm">J</span><span class="kc sm">K</span><span class="kc sm">K</span></span></div></div>
+      <div><div class="stage" style="height:74%"><div class="ground"></div>
+          <div class="sp" data-sheet="assets/img/mack/Attack2.png" style="left:6px;bottom:-24px;transform:scale(.9);filter:drop-shadow(0 0 10px rgba(201,53,39,.95))"></div>
+          <div class="sp" data-sheet="assets/img/kenji/Death.png" style="right:2px;bottom:-24px;transform:scaleX(-1) scale(.9)"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px"><span class="cardname" style="color:var(--crim)">I 超必殺</span><span><span class="kc sm">I</span></span></div></div>
+    </div>
+    <div class="dot" style="top:508px;left:486px">3</div>
+    <div style="position:absolute;bottom:44px;left:0;right:0;text-align:center;color:var(--gold);font-size:14px;letter-spacing:6px">● ○ ○</div>
+    <div class="foot">A/D PAGE · W/S CHARACTER · ESC BACK</div>
+  </div></div>
+  <div class="notes">
+    <b>●1</b> 基础移动/格挡固定在顶栏(纯文字,不占卡位)。<b>●2</b> 3×2 全动图卡,每招一卡。<b>●3</b> 翻页点:全部招式约 14-16 个 = 3 页。
+    <b>局限:</b>同屏 6 个演示一起动很花、找具体某招要翻页;同屏多实例渲染开销最大(可做"只动选中卡"缓解,但那就退化成 V2)。
+  </div>
+</section>
+
+<!-- ================= V4 ================= -->
+<section>
+  <div class="vh"><span class="tag">V4</span><h2>道场教学 — 跟练关卡(二期,放进「修行」)</h2><span class="who">(你的"出招瞬间按键提示"完全体)</span></div>
+  <div class="fwrap"><div class="frame" data-scale>
+    <div class="stagebg"></div>
+    <div style="position:absolute;inset:0;background:rgba(7,8,12,.45)"></div>
+    <div class="band" style="background:linear-gradient(#2a1210,#1a0c0a)"><span class="t" style="color:var(--crim)">DOJO</span><span class="tj">· 指導修行</span>
+      <span style="margin-left:22px;font-size:14px;color:var(--cream)">第三課 · 防御 GUARD</span>
+      <span style="margin-left:auto" class="hint en" style="font-size:9px">LESSON 3 / 5</span>
+    </div>
+    <div class="dot" style="top:200px;left:300px">1</div>
+    <!-- live battle area -->
+    <div class="ground" style="position:absolute;left:0;right:380px;bottom:110px;height:2px;background:rgba(217,164,65,.3)"></div>
+    <div class="sp" data-sheet="assets/img/mack/Idle.png" style="left:120px;bottom:104px;transform:scale(2);transform-origin:bottom center"></div>
+    <div class="sp" data-sheet="assets/img/kenji/Attack1.png" style="left:360px;bottom:104px;transform:scaleX(-1) scale(2);transform-origin:bottom center"></div>
+    <!-- flashing guard prompt -->
+    <div style="position:absolute;left:96px;bottom:330px;display:flex;align-items:center;gap:10px;animation:blink .5s steps(2) infinite">
+      <span class="kc" style="min-width:44px;height:44px;font-size:18px;border-color:var(--gold2);box-shadow:0 0 16px rgba(255,226,122,.8), inset 0 -5px 0 rgba(0,0,0,.55)">←</span>
+      <span style="font-size:18px;color:var(--gold2);text-shadow:0 0 10px rgba(201,53,39,.9)">防!!</span>
+    </div>
+    <div class="dot" style="top:64px;right:352px">2</div>
+    <!-- right lesson list -->
+    <div style="position:absolute;top:70px;right:26px;bottom:70px;width:330px;border:2px solid var(--line);background:rgba(20,12,9,.94);padding:16px 18px">
+      <div class="cardname" style="margin-bottom:14px;color:var(--gold)">課題 LESSONS</div>
+      <div class="lrow done">✓ 第一課 · 移動と疾走</div>
+      <div class="lrow done">✓ 第二課 · 斬撃 J / K</div>
+      <div class="lrow now">▶ 第三課 · 防御<br><span class="hint" style="font-weight:normal">敌人出招瞬间按住 ← 格挡 ·连续防住 3 次</span>
+        <div style="margin-top:8px;display:flex;gap:6px"><span class="pip on"></span><span class="pip on"></span><span class="pip"></span></div>
+      </div>
+      <div class="lrow">○ 第四課 · 連携 J·J·K·K</div>
+      <div class="lrow">○ 第五課 · 超必殺</div>
+      <div style="margin-top:20px;padding-top:14px;border-top:1px solid var(--line)" class="hint">
+        在真实战斗里跟着提示完成课题<br>全部通过 = 出师 · 解锁称号「免許皆伝」
+      </div>
+    </div>
+    <div class="foot">FOLLOW THE PROMPTS · ESC QUIT DOJO</div>
+  </div></div>
+  <div class="notes">
+    <b>●1</b> 真战斗画面 + 脚本化木桩:敌人出招的瞬间,角色头顶闪 <span class="kc sm">←</span>「防!!」,按对了课题进度 +1 —— 你的点子在这里是核心玩法。
+    <b>●2</b> 右侧课程清单,5 课从移动教到超杀。<b>定位:</b>不替代 How to Play 面板,而是「修行」菜单里的新模式(How to Play 负责查阅,道场负责上手)。开发量最大:要写课程脚本 + 判定逻辑。
+  </div>
+</section>
+
+<!-- ================= compare ================= -->
+<h1 style="font-size:16px">四案对比</h1>
+<table>
+  <tr><th style="width:110px">方案</th><th>教学效果</th><th>覆盖面</th><th>开发量</th><th>备注</th></tr>
+  <tr><td><b>V1 混合式</b></td><td>中 — 秘技看得懂了,但连招表不全</td><td>4 个精选招</td><td>小(1-2 天)</td><td>最小改动;适合先快速止血</td></tr>
+  <tr><td><b>V2 图鉴式 ★</b></td><td>高 — 每招都有活演示+要点</td><td><b>全部招式 × 双角色</b></td><td>中(2-4 天)</td><td>复用 anim-lab 机制;一次只渲染一个演示;W/S/A/D 导航与游戏一致</td></tr>
+  <tr><td><b>V3 卡片墙</b></td><td>中高 — 视觉最炫</td><td>全部(翻页)</td><td>中大</td><td>同屏 6 演示开销大、找招要翻页</td></tr>
+  <tr><td><b>V4 道场</b></td><td>最高 — 手把手跟练</td><td>5 课核心技能</td><td>大(课程脚本+判定)</td><td>建议二期;入口放「修行」菜单</td></tr>
+</table>
+
+<div class="verdict">
+  <b>建议路线:</b>本期做 <b>V2</b>(How to Play 直接升级成图鉴,防御条目内嵌"出招瞬间闪 ← 提示"的演示);二期做 <b>V4</b> 道场放进「修行」。
+  <br><b>实装要点(已想清楚):</b>① 演示台复用 anim-lab 的真引擎迷你回放(真 Fighter + 木桩 + 刀光特效),不用录任何 GIF,平衡数值改动自动同步;
+  ② 招式清单直接从 data.js 生成,双角色各一份,新增招式零维护;③ 新增日文字符需要重新子集化字体(现在的字体是按现有文案裁的);④ 纯键盘导航,和现有菜单同一套输入习惯。
+</div>
+
+<style>
+.mrow{padding:7px 16px;font-size:13px;color:var(--mut);border-left:3px solid transparent}
+.mrow.on{color:var(--gold2);background:rgba(217,164,65,.12);border-left-color:var(--gold)}
+.lrow{padding:9px 0;font-size:14px;color:var(--mut)}
+.lrow.done{color:#7fa06a}
+.lrow.now{color:var(--gold2);font-weight:bold}
+.pip{width:26px;height:8px;background:#252b3d;display:inline-block}
+.pip.on{background:var(--gold)}
+@keyframes blink{50%{opacity:.25}}
+</style>
+<script>
+// live sprite previews: real sheets, 200px/frame, steps() loop
+document.querySelectorAll('.sp').forEach(el => {
+  const img = new Image();
+  img.src = el.dataset.sheet;
+  img.onload = () => {
+    const n = Math.max(1, Math.round(img.naturalWidth / 200));
+    el.style.backgroundImage = `url(${img.src})`;
+    el.style.setProperty('--n', n);
+  };
+});
+// scale 1024x576 frames to container width
+function fit() {
+  document.querySelectorAll('.frame').forEach(f => {
+    const w = f.parentElement.clientWidth;
+    const s = Math.min(1, w / 1024);
+    f.style.transform = `scale(${s})`;
+    f.parentElement.style.height = (576 * s) + 'px';
+  });
+}
+addEventListener('resize', fit); fit();
+</script>
+</body>
+</html>

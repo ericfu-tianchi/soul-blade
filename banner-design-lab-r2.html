@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>刀魂 · 全屏横批 4 案 (banner-design-lab R2)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+@font-face { font-family:'PressStart'; src:url('assets/fonts/PressStart2P.ttf') format('truetype'); }
+@font-face { font-family:'FusionPixel'; src:url('assets/fonts/FusionPixel-zh.woff2') format('woff2'); }
+@font-face { font-family:'FusionPixelJA'; src:url('assets/fonts/FusionPixel-ja.woff2') format('woff2'); }
+:root{ --ink:#0b0708; --line:#6a4a24; --gold:#d9a441; --gold2:#ffe27a; --cream:#f4ead6; --mut:#9a8f78; --crim:#c93527; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--cream);font-family:'FusionPixelJA','FusionPixel','Hiragino Sans GB',sans-serif;padding:26px 18px 80px}
+.en{font-family:'PressStart',monospace}
+h1{font-size:20px;color:var(--gold2);letter-spacing:2px;margin-bottom:6px}
+.sub{color:var(--mut);font-size:12px;margin-bottom:22px;line-height:1.8;max-width:1024px}
+.sub b{color:var(--gold)}
+section{margin-bottom:50px}
+.vh{display:flex;align-items:baseline;gap:12px;margin-bottom:8px}
+.vh .tag{font-family:'PressStart',monospace;font-size:13px;color:var(--ink);background:var(--gold);padding:4px 10px}
+.vh .tag.rec{background:var(--crim);color:var(--gold2)}
+.vh h2{font-size:16px;color:var(--cream)}
+.vh .who{color:var(--mut);font-size:12px}
+.notes{font-size:12px;color:var(--mut);line-height:2;margin-top:8px;max-width:1024px}
+.notes b{color:var(--gold)}
+.px{image-rendering:pixelated}
+/* 全尺寸游戏画面 1024x576, 横批按实装位摆放 (公告文字中心 = 游戏 cy 250) */
+.frame{width:1024px;height:576px;position:relative;overflow:hidden;border:2px solid var(--line);
+  background:url('assets/ui-lab/stage-alt.png') center/cover #120a08}
+.frame::before{content:'';position:absolute;inset:0;background:rgba(7,8,12,.28)}
+.band{position:absolute;left:0;width:1024px;z-index:2}
+.bt{position:absolute;left:0;right:0;text-align:center;z-index:3}
+.bt .k{display:block;letter-spacing:12px;font-size:34px}
+.bt .e{display:block;font-family:'PressStart',monospace;letter-spacing:5px;font-size:10px;margin-top:10px}
+.cap{position:absolute;left:10px;top:8px;font-family:'PressStart',monospace;font-size:8px;color:#8a94a8;
+  background:rgba(10,8,6,.7);padding:3px 8px;z-index:5}
+table{border-collapse:collapse;font-size:13px;max-width:1024px;width:100%;margin-top:8px}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;line-height:1.7}
+th{background:#211510;color:var(--gold2);font-size:12px}
+td b{color:var(--gold2)}
+.verdict{border:2px solid var(--gold);background:#241610;padding:14px 18px;font-size:13px;line-height:2.1;margin-top:20px;max-width:1024px}
+.verdict b{color:var(--gold2)}
+</style>
+</head>
+<body>
+
+<h1>全屏横批 — 边到边 4 案 <span class="en" style="font-size:11px;color:var(--mut)">banner-design-lab · R2</span></h1>
+<div class="sub">上一轮的问题:横幅不是全屏宽(黑带 + 两个圆纹章 + 几根金线是程序画的,不是实物)。本轮 4 案全部:①<b>真·1024 全幅</b>,匾体两端被屏幕切断(匾比屏幕更长的错觉),素材已抠底、原生像素密度,不靠放大裁切;②生图实物匾/幕,<b>牌匾 + 流苏</b>语汇;③预览为 1024×576 <b>全尺寸游戏画面</b>、横批按实装位置摆放(文字中心 = 游戏公告线 cy250),所见即实装比例。四案统一演示「一本目 / ROUND 1」。</div>
+
+<!-- ============ V1 素匾长条 (band-full-e) ============ -->
+<section>
+  <div class="vh"><span class="tag rec">V1 ★推荐</span><h2>素匾长条 — 漆轨金杆 · 双绦流苏</h2><span class="who">最"横批":最扁、最舒展</span></div>
+  <div class="frame">
+    <span class="cap">ROUND START · FULL-BLEED 1024</span>
+    <img class="band px" src="assets/ui-lab/band-full-e-cut.png" style="top:100px">
+    <div class="bt" style="top:226px"><span class="k" style="color:#3a2214">一本目</span><span class="e" style="color:#7a4a20">ROUND 1</span></div>
+  </div>
+  <div class="notes"><b>定位:</b>贴合你说的"长条"——上下两根细漆轨 + 金杆饰 + 顶心金纹章,双股编绳流苏垂在两侧;纸面最宽,文字最透气。绳从画外上方垂入,有"挂在屏幕外"的空间感。</div>
+</section>
+
+<!-- ============ V2 墨檀锦匾 (band-full-b) ============ -->
+<section>
+  <div class="vh"><span class="tag">V2</span><h2>墨檀锦匾 — 暗纹檀底 · 金框纸窗 · 金冒流苏</h2><span class="who">最华丽、最典礼</span></div>
+  <div class="frame">
+    <span class="cap">ROUND START · FULL-BLEED 1024</span>
+    <img class="band px" src="assets/ui-lab/band-full-b-cut.png" style="top:61px">
+    <div class="bt" style="top:226px"><span class="k" style="color:#3a2214">一本目</span><span class="e" style="color:#7a4a20">ROUND 1</span></div>
+  </div>
+  <div class="notes"><b>定位:</b>深檀色暗花缎底横贯全屏,中央金圆角纸窗承字,两端整支金冒红流苏压边——装饰量最大,K.O./结算这类"重时刻"最压场。</div>
+</section>
+
+<!-- ============ V3 奉纳漆匾 (band-full-a) ============ -->
+<section>
+  <div class="vh"><span class="tag">V3</span><h2>奉纳漆匾 — 黑漆厚框 · 云纹金件 · 结绳流苏</h2><span class="who">上一轮牌匾的全屏版</span></div>
+  <div class="frame">
+    <span class="cap">ROUND START · FULL-BLEED 1024</span>
+    <img class="band px" src="assets/ui-lab/band-full-a-cut.png" style="top:106px">
+    <div class="bt" style="top:226px"><span class="k" style="color:#3a2214">一本目</span><span class="e" style="color:#7a4a20">ROUND 1</span></div>
+  </div>
+  <div class="notes"><b>定位:</b>你之前喜欢的那块奉纳匾直接拉通全屏:厚漆框 + 云纹金件 + 铆钉 + 内圈朱线,中国结流苏挂两侧。四案里最矮(294px),遮挡最小。</div>
+</section>
+
+<!-- ============ V4 陣幕帘 (band-full-c) ============ -->
+<section>
+  <div class="vh"><span class="tag">V4</span><h2>陣幕帘 — 顶挂绯幕 · 纹章横列 · 金绳大流苏</h2><span class="who">从屏幕顶垂下,战味最浓</span></div>
+  <div class="frame">
+    <span class="cap">ROUND START · FULL-BLEED 1024</span>
+    <img class="band px" src="assets/ui-lab/band-full-c-cut.png" style="top:0">
+    <div class="bt" style="top:226px"><span class="k" style="color:#3a2214">一本目</span><span class="e" style="color:#8a5430">ROUND 1</span></div>
+  </div>
+  <div class="notes"><b>定位:</b>唯一"从屏幕顶上挂下来"的一案:木杆贴顶、绯布撕边下摆、十三枚纹章横列、金绳大流苏坠两角。仪式换成杀气,公告可做"揭幕"演出(幕布落下→定字)。</div>
+</section>
+
+<!-- ============ 对比 ============ -->
+<h1 style="font-size:15px">四案对比</h1>
+<table>
+  <tr><th style="width:130px">方案</th><th>气质</th><th>占屏高度</th><th>备注</th></tr>
+  <tr><td><b>V1 素匾长条 ★</b></td><td>舒展·正统横批</td><td>380px(纸面扁)</td><td>最贴"长条"要求;流苏最醒目</td></tr>
+  <tr><td><b>V2 墨檀锦匾</b></td><td>华丽·典礼</td><td>387px</td><td>装饰密度最高;暗底上金字也可</td></tr>
+  <tr><td><b>V3 奉纳漆匾</b></td><td>权威·official</td><td>294px(最矮)</td><td>与你认可的结算匾同语汇,遮挡最小</td></tr>
+  <tr><td><b>V4 陣幕帘</b></td><td>杀气·战阵</td><td>407px(贴顶)</td><td>可做落幕出场动画;下摆撕边有动势</td></tr>
+</table>
+
+<div class="verdict">
+  <b>我的推荐:V1 素匾长条</b>——同时满足你点的三件事:横跨全屏、长条比例、牌匾+流苏。V2 留作 K.O./结算"重时刻"的升级选项(混编思路)。<br>
+  拍板后实装:替换 annBack 程序画带 → 实物横批资产(1024 全幅,文字改墨色落纸面),再用参考图重绘出一版<b>败北灰调孪生</b>(同构图换灰蓝布)给 DEFEAT。原图在 assets/ui-lab/band-full-*.png;哪处不满意(颜色/流苏位置/匾体高度)说一声,单独重 roll,30 秒一张。
+</div>
+
+</body>
+</html>

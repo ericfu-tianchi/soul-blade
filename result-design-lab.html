@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>刀魂 · 结算页 v2 — 生图双生方案 (result-design-lab)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+@font-face { font-family:'PressStart'; src:url('assets/fonts/PressStart2P.ttf') format('truetype'); }
+@font-face { font-family:'FusionPixel'; src:url('assets/fonts/FusionPixel-zh.woff2') format('woff2'); }
+@font-face { font-family:'FusionPixelJA'; src:url('assets/fonts/FusionPixel-ja.woff2') format('woff2'); }
+:root{ --ink:#0b0708; --line:#6a4a24; --gold:#d9a441; --gold2:#ffe27a; --cream:#f4ead6; --mut:#9a8f78; --crim:#c93527; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--cream);font-family:'FusionPixelJA','FusionPixel','Hiragino Sans GB',sans-serif;padding:26px 18px 80px}
+.en{font-family:'PressStart',monospace}
+h1{font-size:20px;color:var(--gold2);letter-spacing:2px;margin-bottom:6px}
+.sub{color:var(--mut);font-size:12px;margin-bottom:20px;line-height:1.8}
+section{margin-bottom:52px}
+.vh{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+.vh .tag{font-family:'PressStart',monospace;font-size:13px;color:var(--ink);background:var(--gold);padding:4px 10px}
+.vh h2{font-size:16px;color:var(--cream)}
+.notes{font-size:12px;color:var(--mut);line-height:2;margin-top:10px;max-width:1024px}
+.notes b{color:var(--gold)}
+.fwrap{max-width:1024px}
+.frame{width:1024px;height:576px;position:relative;overflow:hidden;transform-origin:top left;border:2px solid var(--line)}
+.px{image-rendering:pixelated}
+/* 结果大字: 墨书于匾(实装换毛笔字体) */
+.title-k{position:absolute;top:36px;left:0;right:0;text-align:center;font-size:58px;letter-spacing:14px;
+  color:#3a2214;text-shadow:1px 1px 0 rgba(255,240,200,.35)}
+.title-e{position:absolute;top:104px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:8px;color:#6a4a24}
+/* 战绩(右面板) */
+.stats{position:absolute;right:66px;top:130px;width:158px}
+.stats .hd{font-family:'PressStart',monospace;font-size:9px;color:#7a4a20;letter-spacing:2px;text-align:center;
+  padding-bottom:8px;border-bottom:2px solid rgba(90,50,20,.35);margin-bottom:10px}
+.stats .row{padding:7px 0;text-align:center}
+.stats .lb{display:block;font-size:10px;color:#8a6440;letter-spacing:1px}
+.stats .vl{display:block;font-family:'PressStart',monospace;font-size:15px;color:#4a2a12;margin-top:3px}
+/* 台词(底部卷轴) */
+.quote{position:absolute;left:355px;bottom:34px;width:330px;text-align:center;color:#4a2a12}
+.quote .who{font-family:'PressStart',monospace;font-size:8px;color:#8a5430;display:block;margin-bottom:5px;letter-spacing:1px}
+.quote .tx{font-size:16px;letter-spacing:1px}
+/* footer */
+.foot{position:absolute;left:0;right:0;bottom:2px;text-align:center;font-family:'PressStart',monospace;font-size:9px;color:#7d8598}
+.foot b{color:var(--gold2);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.5}}
+.dot{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--crim);color:var(--gold2);
+  display:flex;align-items:center;justify-content:center;font-family:'PressStart',monospace;font-size:11px;z-index:9;
+  box-shadow:0 0 0 2px rgba(255,226,122,.7)}
+.thumbs{display:flex;gap:14px;max-width:1024px}
+.thumbs figure{flex:1}
+.thumbs img{width:100%;border:1px solid var(--line)}
+.thumbs figcaption{font-size:11px;color:var(--mut);padding-top:4px}
+.verdict{border:2px solid var(--gold);background:#241610;padding:14px 18px;font-size:13px;line-height:2.1;margin-top:8px;max-width:1024px}
+.verdict b{color:var(--gold2)}
+</style>
+</head>
+<body>
+
+<h1>结算页 v2 — 生图双生底板 + 真素材合成 <span class="en" style="font-size:11px;color:var(--mut)">result-design-lab</span></h1>
+<div class="sub">底板由生图管线产出(与游戏全部 UI 资产同一条 Gemini 管线、同一风格前缀,调性同源)。<b style="color:var(--gold)">胜利/战败为结构级对称双生</b>:战败版是把胜利版整图喂回模型"同构重绘"——同一横匾、同一立绘拱位、同一战绩面板、同一台词卷轴,只有材质与情绪互换(旭日金瓣暖灯 ↔ 苍月灰烬冷雾)。字与立绘为游戏真素材叠加。</div>
+
+<!-- ============ 胜利 ============ -->
+<section>
+  <div class="vh"><span class="tag">勝</span><h2>VICTORY — 旭日 · 金瓣 · 暖灯</h2></div>
+  <div class="fwrap"><div class="frame" data-scale>
+    <img src="assets/ui-lab/result-win-c.png" class="px" style="position:absolute;inset:0;width:1024px;height:576px">
+    <div class="dot" style="top:30px;left:300px">1</div>
+    <div class="title-k">勝利</div>
+    <div class="title-e en">VICTORY</div>
+    <div class="dot" style="top:120px;left:36px">2</div>
+    <img src="assets/ui-lab/portrait-hayato-sel.png" class="px"
+         style="position:absolute;left:44px;bottom:66px;width:212px;filter:drop-shadow(0 0 18px rgba(255,120,60,.35))">
+    <div class="dot" style="top:112px;right:236px">3</div>
+    <div class="stats">
+      <div class="hd">戦績</div>
+      <div class="row"><span class="lb">ROUNDS</span><span class="vl">2 - 0</span></div>
+      <div class="row"><span class="lb">MAX COMBO</span><span class="vl">9</span></div>
+      <div class="row"><span class="lb">DMG DEALT</span><span class="vl">217</span></div>
+      <div class="row"><span class="lb">SUPERS</span><span class="vl">2</span></div>
+      <div class="row"><span class="lb">TIME</span><span class="vl">0:47</span></div>
+    </div>
+    <div class="dot" style="bottom:86px;left:322px">4</div>
+    <div class="quote">
+      <span class="who">KENJI · 剣二</span>
+      <span class="tx">「刀は、鞘に戻った。」</span>
+    </div>
+    <div class="foot"><b>J REMATCH</b> &nbsp;·&nbsp; K CHARACTER &nbsp;·&nbsp; ESC TITLE</div>
+  </div></div>
+  <div class="notes">
+    <b>●1</b> 匾上墨书「勝利」(实装用毛笔字体, 需向字体子集加 勝利敗北 四字, ~2KB)。<b>●2</b> 拱形立绘位是底板画好的(带暖色顶光), 真立绘直接放入。
+    <b>●3</b> 战绩用竖排面板: ROUNDS / MAX COMBO 现成, DMG·SUPERS·TIME 需加 3 个计数器(~10 行)。<b>●4</b> 台词写进卷轴纸面(墨色), 你喜欢的 quote 机制原样保留。
+  </div>
+</section>
+
+<!-- ============ 战败 ============ -->
+<section>
+  <div class="vh"><span class="tag" style="background:#5a6a7a;color:#e8eef4">敗</span><h2>DEFEAT — 苍月 · 灰烬 · 冷雾(同构双生)</h2></div>
+  <div class="fwrap"><div class="frame" data-scale>
+    <img src="assets/ui-lab/result-lose-c.png" class="px" style="position:absolute;inset:0;width:1024px;height:576px">
+    <div class="title-k" style="color:#232c38;text-shadow:1px 1px 0 rgba(220,230,240,.28)">敗北</div>
+    <div class="title-e en" style="color:#46525e">DEFEAT</div>
+    <div class="dot" style="top:120px;left:36px">1</div>
+    <img src="assets/ui-lab/portrait-hayato-sel.png" class="px"
+         style="position:absolute;left:44px;bottom:66px;width:212px;filter:saturate(.35) brightness(.72)">
+    <div class="dot" style="top:112px;right:236px">2</div>
+    <div class="stats">
+      <div class="hd" style="color:#3c4854;border-color:rgba(60,72,84,.4)">戦績</div>
+      <div class="row"><span class="lb" style="color:#5a6672">ROUNDS</span><span class="vl" style="color:#333c46">1 - 2</span></div>
+      <div class="row"><span class="lb" style="color:#5a6672">MAX COMBO</span><span class="vl" style="color:#333c46">6</span></div>
+      <div class="row"><span class="lb" style="color:#5a6672">DMG DEALT</span><span class="vl" style="color:#333c46">164</span></div>
+      <div class="row"><span class="lb" style="color:#8a2a20">敵残 HP</span><span class="vl" style="color:#a03028">18</span></div>
+      <div class="row"><span class="lb" style="color:#5a6672">TIME</span><span class="vl" style="color:#333c46">1:12</span></div>
+    </div>
+    <div class="dot" style="bottom:130px;left:322px">3</div>
+    <div style="position:absolute;left:0;right:0;bottom:112px;text-align:center;font-size:12px;color:#7a86a0">
+      <span class="en" style="font-size:8px;color:#5a6680">HAYATO</span>&nbsp;「遅すぎる。」
+    </div>
+    <div class="quote">
+      <span class="who" style="color:#4a5560">KENJI · 剣二</span>
+      <span class="tx" style="color:#2e3844">「……見事だ。もう一度！」</span>
+    </div>
+    <div class="dot" style="bottom:16px;left:360px">4</div>
+    <div class="foot"><b style="font-size:12px">J 再戦 REMATCH</b> &nbsp;·&nbsp; K CHARACTER &nbsp;·&nbsp; ESC TITLE</div>
+  </div></div>
+  <div class="notes">
+    <b>●1</b> 同一拱位放<b>你的角色</b>(降饱和+压暗 = 败者冷处理), 与胜利页构图完全一致 —— 你要的对称。
+    <b>●2</b> 同一战绩面板, 多一行红字「<b>敵残 HP 18</b>」: 告诉玩家"就差 18 血", 最强的再战动机。
+    <b>●3</b> <b>双声部台词</b>: 胜者的挑衅一行小字(隼人「遅すぎる。」), 卷轴里是你角色的败词 —— 剣二的「……見事だ。もう一度!」天然把情绪引向再战。
+    <b>●4</b> J 再戦 是全页唯一脉动发亮的元素。
+  </div>
+</section>
+
+<!-- ============ 备选底板 ============ -->
+<h1 style="font-size:15px">备选底板(首轮方图,构图同位但装饰差异较大)</h1>
+<div class="thumbs">
+  <figure><img src="assets/ui-lab/result-win-a.png" class="px"><figcaption>win-a 旭日横匾版(方图)</figcaption></figure>
+  <figure><img src="assets/ui-lab/result-lose-a.png" class="px"><figcaption>lose-a 苍月挂牌版(方图)</figcaption></figure>
+  <figure><img src="assets/ui-lab/result-win-b.png" class="px"><figcaption>win-b 对称圆窗版(方图)</figcaption></figure>
+  <figure><img src="assets/ui-lab/result-lose-b.png" class="px"><figcaption>lose-b 对称圆窗版(方图)</figcaption></figure>
+</div>
+
+<div class="verdict">
+  <b>推荐:上面这对 16:9 双生底板直接实装。</b>实装账单: ① 底板 2 张已生成(在 assets/ui-lab, 与其它 UI 资产同管线);
+  ② drawResult 重写为"底板 + 定位文字/立绘"(与现在同一渲染方式, 无新机制); ③ 统计计数器 3 个(伤害/超必/用时, ~10 行);
+  ④ 毛笔字体子集补「勝利敗北」四字(~2KB); ⑤ 双声部台词零新内容(quoteWin/quoteLose 数据早已就位)。
+  底板若有想改的细节(比如战败版背后的红霞想更冷、匾额想更宽), 生图管线重出一张只要 30 秒。
+</div>
+
+<script>
+function fit() {
+  document.querySelectorAll('.frame').forEach(f => {
+    const w = f.parentElement.clientWidth;
+    const s = Math.min(1, w / 1024);
+    f.style.transform = `scale(${s})`;
+    f.parentElement.style.height = (576 * s) + 'px';
+  });
+}
+addEventListener('resize', fit); fit();
+</script>
+</body>
+</html>
